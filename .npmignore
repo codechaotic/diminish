@@ -1,0 +1,5 @@
+node_modules/
+.nyc_output/
+mocha.opts
+wercker.yml
+*.spec.js
