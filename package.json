@@ -5,6 +5,14 @@
   "main": "src",
   "author": "Asa Jones <thinkinfractals@gmail.com>",
   "license": "ISC",
+  "keywords": [
+    "dependency",
+    "injection",
+    "inversion",
+    "control",
+    "ioc",
+    "di"
+  ],
   "scripts": {
     "spec": "mocha --opts mocha.opts src/**/*.spec.js",
     "nyc": "nyc npm run spec",
