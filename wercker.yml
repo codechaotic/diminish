@@ -15,3 +15,12 @@ build:
         code: |
           echo "node version $(node -v) running"
           echo "npm version $(npm -v) running"
+
+release:
+  # The steps that will be executed on build
+  steps:
+    # A step that executes `npm publish` command
+    - script:
+      name: npm publish
+      code: |
+        npm publish --dry-run
