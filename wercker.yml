@@ -23,4 +23,4 @@ release:
     - script:
       name: npm publish
       code: |
-        npm publish --dry-run
+        npm publish
