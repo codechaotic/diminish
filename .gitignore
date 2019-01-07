@@ -1,2 +1,8 @@
+dist/
+type/
 node_modules/
 .nyc_output/
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map

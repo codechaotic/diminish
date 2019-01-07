@@ -1,1 +1,4 @@
 --reporter spec
+--require ts-node/register
+--require source-map-support/register
+--recursive

@@ -1,15 +1,17 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-env mocha */
 
-const expect = require('chai').expect
-const sinon = require('sinon')
-const chai = require('chai')
+import * as chai from 'chai'
+import * as sinon from 'sinon'
+import * as sinonChai from 'sinon-chai'
+import * as chaiAsPromised from 'chai-as-promised'
 
-chai.use(require('sinon-chai'))
-chai.use(require('chai-as-promised'))
+chai.use(sinonChai)
+chai.use(chaiAsPromised)
 
-const Resolver = require('./Resolver')
-const Diminish = require('./Diminish')
+const expect = chai.expect
+
+import { Resolver } from './Resolver'
 
 describe('Resolver', function () {
   let parse
