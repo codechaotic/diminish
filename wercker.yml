@@ -1,26 +1,60 @@
-box: node:latest
-# Build definition
-build:
-  # The steps that will be executed on build
+lint:
+  box: node:8-slim
   steps:
-    # A step that executes `npm install` command
     - npm-install
-    # A step that executes `npm test` command
+    - script:
+      name: lint
+      code: npm run lint
+
+coverage:
+  box: node:8-slim
+  steps:
+    - npm-install
+    - npm-test
+    - script:
+      name: lint
+      code: |
+        npm test
+        npm run coverage
+
+test.6.4.0:
+  box: node:6.4.0-slim
+  steps:
+    - npm-install
     - npm-test
 
-    # A custom script step, name value is used in the UI
-    # and the code value contains the command that get executed
-    - script:
-        name: echo nodejs information
-        code: |
-          echo "node version $(node -v) running"
-          echo "npm version $(npm -v) running"
+test.6:
+  box: node:6-slim
+  steps:
+    - npm-install
+    - npm-test
+
+test.7:
+  box: node:7-slim
+  steps:
+    - npm-install
+    - npm-test
+
+test.8:
+  box: node:8-slim
+  steps:
+    - npm-install
+    - npm-test
+
+test.9:
+  box: node:9-slim
+  steps:
+    - npm-install
+    - npm-test
+
+test.10:
+  box: node:10-slim
+  steps:
+    - npm-install
+    - npm-test
 
 release:
-  # The steps that will be executed on build
   steps:
-    # A step that executes `npm publish` command
     - script:
       name: npm publish
-      code: |
-        npm publish
+      code: npm publish

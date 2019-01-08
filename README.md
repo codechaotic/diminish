@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/codechaotic/diminish/badge.svg?branch=develop)](https://coveralls.io/github/codechaotic/diminish?branch=develop)
+
 ## Diminish <small>Minimal Dependency Injection</small>
 
 ### Getting Started
@@ -123,5 +125,3 @@ container.invoke(({ itemOne }) => {
   // itemOne will have type number
 })
 ```
-
- 
