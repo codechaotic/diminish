@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import { parseScript } from 'esprima'
 import * as assert from 'assert'
 
@@ -7,7 +9,7 @@ const NATIVE_REGEXP = /\{\s*\[native code\]\s*\}/
 // Items in the result can be a string, representing an identifier name, or
 // an array of strings, representing identifier names to attach to an object.
 // i.e. if fn = (a, { b }) => {}, extractArgs(fn) -> ['a', ['b']]
-export function parse (fn) : { type: 'class'|'function'|'arrow', args: Array<string|Array<string>> } {
+export function parse (fn: Function) : { type: 'class'|'function'|'arrow', args: Array<string|Array<string>> } {
   assert(fn instanceof Function, 'Must be a function or class')
   assert(!NATIVE_REGEXP.test('' + fn), 'Cannot extract from a native function')
 
@@ -37,17 +39,17 @@ export function parse (fn) : { type: 'class'|'function'|'arrow', args: Array<str
       break
   }
 
-  let args
+  let args : any
   if (target !== null) args = parseFunctionArgs(target)
   else args = []
 
   return { type, args }
 }
 
-export function parseDeclaration (fn) {
+export function parseDeclaration (fn : Function) {
   assert(fn instanceof Function, 'Must be a function')
 
-  let script
+  let script : any
 
   // Parsing fn.toString() directly fails for anonymous function definitions.
   // Wrapping it in a pointless assignment ensures it's always parsable
@@ -67,7 +69,7 @@ export function parseDeclaration (fn) {
   return expression.right
 }
 
-export function parseFunctionArgs (expression) {
+export function parseFunctionArgs (expression: any) {
   let args = []
   for (const param of expression.params) {
     switch (param.type) {
@@ -86,7 +88,7 @@ export function parseFunctionArgs (expression) {
   return args
 }
 
-export function parseClassConstructor (expression) {
+export function parseClassConstructor (expression: any) {
   const { body } = expression.body
   let classConstructor = null
   for (let definition of body) {

@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import * as assert from 'assert'
 import {
   Factory,
@@ -23,7 +25,7 @@ export class Resolver<Result> {
   private _promise : Promise<Result>
   private _value : Result
 
-  private _apply (context, params: any[]) {
+  private _apply (context: any, params: any[]) {
     switch (this._type) {
       case 'class':
         const Class = Function.prototype.bind.apply(this._fn, [null].concat(params)) as Constructor<Result>
@@ -54,7 +56,7 @@ export class Resolver<Result> {
 
         for (const key of keys) {
           if (obj[key] instanceof Promise) {
-            promises.push(obj[key].then(value => obj[key] = value))
+            promises.push(obj[key].then((value:any) => (obj[key] = value)))
           }
         }
 
@@ -69,7 +71,7 @@ export class Resolver<Result> {
 
     for (let i = 0; i < params.length; i++) {
       if (params[i] instanceof Promise) {
-        promises.push(params[i].then(result => {
+        promises.push(params[i].then((result:any) => {
           return params.splice(i, 1, result)
         }))
       }

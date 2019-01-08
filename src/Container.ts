@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-dupe-class-members */
+
 import {
   LiteralObject,
   ProducerObject,
@@ -12,9 +15,9 @@ const KEY_REGEX = /[a-zA-Z_$][0-9a-zA-Z_$]*/
 export class Container<ITypes = any> {
   private _registry = new Registry<ITypes>()
 
-  public register (obj: ProducerObject<ITypes>)
-  public register<Key extends keyof ITypes> (key: Key, producer: Producer<ITypes[Key]>)
-  public register (...args) : void{
+  public register (obj: ProducerObject<ITypes>) : void
+  public register<Key extends keyof ITypes> (key: Key, producer: Producer<ITypes[Key]>) : void
+  public register (...args: any[]) : void {
     let obj : ProducerObject<ITypes>
 
     switch (args.length) {
@@ -46,9 +49,9 @@ export class Container<ITypes = any> {
     }
   }
 
-  public literal (obj: LiteralObject<ITypes>)
-  public literal<Key extends keyof ITypes> (key: Key, value: ITypes[Key])
-  public literal (...args) : void {
+  public literal (obj: LiteralObject<ITypes>) : void
+  public literal<Key extends keyof ITypes> (key: Key, value: ITypes[Key]) : void
+  public literal (...args: any[]) : void {
     let obj : LiteralObject<ITypes>
 
     switch (args.length) {
@@ -88,7 +91,7 @@ export class Container<ITypes = any> {
 
   public invoke<Result> (fn: Producer<Result>) : Result | Promise<Result>
   public invoke<Result> (context: any, fn: Producer<Result>) : Result | Promise<Result>
-  public invoke<Result> (...args) : Result | Promise<Result> {
+  public invoke<Result> (...args: any[]) : Result | Promise<Result> {
     let fn : Producer<Result>
     let context : any = null
 

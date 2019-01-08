@@ -2,16 +2,16 @@
 /* eslint-env mocha */
 
 import * as chai from 'chai'
-import * as sinon from 'sinon'
+// import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import * as chaiAsPromised from 'chai-as-promised'
+
+// import { Resolver } from '.'
 
 chai.use(sinonChai)
 chai.use(chaiAsPromised)
 
-const expect = chai.expect
-
-import { Resolver } from '.'
+// const expect = chai.expect
 
 describe('Resolver', function () {
   // let parse

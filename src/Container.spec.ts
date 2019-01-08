@@ -6,12 +6,12 @@ import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import * as chaiAsPromised from 'chai-as-promised'
 
+import * as Diminish from '.'
+
 chai.use(sinonChai)
 chai.use(chaiAsPromised)
 
 const expect = chai.expect
-
-import * as Diminish from '.'
 
 describe('Container', function () {
   let container : Diminish.Container
