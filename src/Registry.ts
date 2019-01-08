@@ -1,5 +1,8 @@
-import { Keys, Values } from './Types'
-import { Resolver } from './Resolver'
+import {
+  Keys,
+  Values,
+  Resolver
+} from '.'
 
 export class Registry<ITypes> {
   private _map = new Map<Keys<ITypes>, Resolver<Values<ITypes>>>()
@@ -10,5 +13,9 @@ export class Registry<ITypes> {
 
   public set <Key extends keyof ITypes> (key: Key, resolver: Resolver<ITypes[Key]>) {
     this._map.set(key, resolver)
+  }
+
+  public has <Key extends keyof ITypes> (key: Key) {
+    return this._map.has(key)
   }
 }

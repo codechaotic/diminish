@@ -1,10 +1,15 @@
-import { LiteralObject, ProducerObject, Producer } from './Types'
-import { ResolverObject, Resolver } from './Resolver'
-import { Registry } from './Registry'
+import {
+  LiteralObject,
+  ProducerObject,
+  Producer,
+  ResolverObject,
+  Resolver,
+  Registry
+} from '.'
 
 const KEY_REGEX = /[a-zA-Z_$][0-9a-zA-Z_$]*/
 
-export class Container<ITypes = { [key:string] : any }> {
+export class Container<ITypes = any> {
   private _registry = new Registry<ITypes>()
 
   public register (obj: ProducerObject<ITypes>)
@@ -22,7 +27,11 @@ export class Container<ITypes = { [key:string] : any }> {
 
     for (const key in obj) {
       if (!KEY_REGEX.test(key as string)) {
-        throw new Error(`Error while registering key '${key}': Key must match ${KEY_REGEX}`)
+        throw new Error(`Error while registering key '${key}': Invalid Key`)
+      }
+
+      if (this._registry.has(key)) {
+        throw new Error(`Error while registering key '${key}': Duplicate key`)
       }
 
       resolvers[key] = new Resolver<any>(this._registry, key as string, obj[key])
@@ -49,6 +58,14 @@ export class Container<ITypes = { [key:string] : any }> {
     }
 
     for (const key in obj) {
+      if (!KEY_REGEX.test(key as string)) {
+        throw new Error(`Error while registering key '${key}': Invalid Key`)
+      }
+
+      if (this._registry.has(key)) {
+        throw new Error(`Error while registering key '${key}': Duplicate key`)
+      }
+
       const producer : Producer<any> = () => obj[key]
       const resolver = new Resolver<any>(this._registry, key as string, producer)
       this._registry.set(key, resolver)
@@ -58,7 +75,7 @@ export class Container<ITypes = { [key:string] : any }> {
   public resolve<Key extends keyof ITypes> (key: Key) : ITypes[Key] | Promise<ITypes[Key]> {
     const resolver = this._registry.get<Key>(key)
 
-    if (!(resolver instanceof Resolver)) {
+    if (!resolver) {
       throw new Error(`Error while resolving ${key}: Not registered`)
     }
 
@@ -85,7 +102,7 @@ export class Container<ITypes = { [key:string] : any }> {
       throw new Error(`Expected arg ${args.length} to be a function or class`)
     }
 
-    const resolver = new Resolver<Result>(this._registry, '*', fn)
+    const resolver = new Resolver<Result>(this._registry, '#', fn)
     return resolver.resolve(context)
   }
 }

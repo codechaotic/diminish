@@ -18,8 +18,14 @@
     "di"
   ],
   "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
     "exclude": [
-      "**/*.spec.ts"
+      "src/**/*.js*",
+      "src/**/*.d.ts*",
+      "src/**/*.spec.ts"
     ]
   },
   "standard": {
@@ -30,7 +36,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rm src/**/*.d.ts* src/**/*.js*",
+    "clean": "rimraf src/**/*.d.ts* src/**/*.js*",
     "spec": "mocha --opts mocha.opts src/**/*.spec.ts",
     "nyc": "nyc npm run spec",
     "lint": "standard src/**/*.ts",
@@ -54,6 +60,7 @@
     "eslint-plugin-typescript": "^0.14.0",
     "mocha": "^5.2.0",
     "nyc": "^13.1.0",
+    "rimraf": "^2.6.3",
     "sinon": "^7.2.2",
     "sinon-chai": "^3.3.0",
     "source-map-support": "^0.5.9",

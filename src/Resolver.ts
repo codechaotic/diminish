@@ -1,7 +1,13 @@
-import { Factory, AsyncFactory, Constructor, Producer, ProducerType } from './Types'
-import { Registry } from './Registry'
-import { parse } from './parse'
 import * as assert from 'assert'
+import {
+  Factory,
+  AsyncFactory,
+  Constructor,
+  Producer,
+  ProducerType,
+  Registry,
+  parse
+} from '.'
 
 export type ResolverObject < ITypes > = {
   [Key in keyof ITypes] : Resolver<ITypes[Key]>
