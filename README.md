@@ -1,4 +1,8 @@
-[![Coverage Status](https://coveralls.io/repos/github/codechaotic/diminish/badge.svg?branch=develop)](https://coveralls.io/github/codechaotic/diminish?branch=develop)
+[![NPM](https://img.shields.io/npm/v/diminish.svg?style=flat-square)](https://www.npmjs.com/package/diminish)
+[![Coverage Status](https://img.shields.io/coveralls/github/codechaotic/diminish/master.svg?style=flat-square)](https://coveralls.io/github/codechaotic/diminish?branch=master)
+[![Build Status](https://img.shields.io/wercker/build/codechaotic/diminish/master.svg?style=flat-square)](https://app.wercker.com/codechaotic/diminish)
+[![Dependencies](https://img.shields.io/librariesio/github/codechaotic/diminish.svg?style=flat-square)](https://libraries.io/github/codechaotic/diminish)
+
 
 ## Diminish <small>Minimal Dependency Injection</small>
 
