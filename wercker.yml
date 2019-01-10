@@ -20,6 +20,10 @@ coverage:
 release:
   box: node:6.4.0
   steps:
+    - npm-install
+    - script:
+      name: compile
+      code: tsc
     - script:
       name: npm publish
       code: npm publish
