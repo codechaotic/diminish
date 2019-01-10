@@ -105,10 +105,49 @@ thing.action()
 //---> Logs "It Works!""
 ```
 
+### Literal Providers
+
+Injecting a provider isn't always what you need. For example, you may want to register a function in a container. You could do this but wrapping the function up in a lightweight do-nothing provider as follows:
+
+```ts
+function someFunction () {
+  console.log('Hey!')
+}
+
+container.register('someFunction', () => someFunction)
+```
+
+To make this easier Diminish includes another method on a container that does the above for you called `literal`.
+
+```ts
+// Adds the function as a trivial provider
+container.literal('someFunction', someFunction)
+```
+
+### Bulk Registration
+
+Often many providers need to be registered at the same time. To make this easier both the `register` and `literal` methods will accept an object dictionary of providers or values respectively.
+
+```ts
+container.register({
+  itemOne () {
+    return 10
+  },
+  itemTwo ({ itemOne }) {
+    return itemOne + 10
+  }
+})
+
+container.literal({
+  someFunction () {
+    console.log('Hey')
+  },
+  someValue: 15
+})
+```
 ### Injection Typing
 
-In all of the above examples, injected dependencies will be have type *any*
-inside of the provider definition. This works for many situations, but ideally the correct type for the injected value would be made available for the developer. In order to do this a custom interface can be given as a generic type to the *Container* constructor.
+In all of the above examples, injected dependencies will have type *any* inside of the provider definition. This works for many simple situations but ideally the types for your dependencies should be available inside the provider. In order to do this a custom interface can be given as a generic type to the *Container* constructor.
 
 ```ts
 interface Types {
@@ -116,12 +155,117 @@ interface Types {
 }
 
 const container = new Container<Types>()
+```
 
-container.register('itemOne', () => {
-  return 1
-})
+The `register` method will only allow registration of names and providers which correspond to a property defined on the generic interface.
 
-container.invoke(({ itemOne }) => {
-  // itemOne will have type number
-})
+```ts
+container.register('itemOne', () => 10) // OK
+container.register('itemTwo', () => 20) // ERROR
+```
+
+The same is true for the `resolve` method. Only keys from the given interface can be requested from the container.
+
+```ts
+const itemOne = container.resolve('itemOne') // OK
+const itemTwo = container.resolve('itemTwo') // ERROR
+```
+
+To use this inside of your providers, use the interface as the parameter type in the function or constructor definition.
+
+```ts
+// Function
+const provider = function ({ itemOne } : Types) {}
+
+// Class
+const provider = class {
+  constructor ({ itemOne } : Types) {}
+}
+```
+
+### Support for Standard Parameters
+
+So far we've only used examples where dependency injection is done using the destructured parameter style. This style is preferred in most cases. However support for standard parameters is included with diminish without any fuss.
+
+```ts
+// This works just fine
+const provider = function itemTwo (itemOne: any) {}
+```
+
+Properly resolving types in your providers will require an additional step. In addition to creating an interface as above, you must create a namespace with the same name and declare the dependency types inside it.
+
+```ts
+interface Types {
+  itemOne: number
+}
+
+namespace Types {
+  type itemOne = number
+}
+```
+
+Now the type can be accessed and used in the provider definitions
+
+```ts
+// Now this works too
+const provider = function itemTwo (itemOne: Types.itemOne) {}
+```
+
+### Global Type
+
+In the above examples the interface used must be defined before the container is created. This means all of the dependencies and their types must be declared or imported prior to that point in the file. This can create issues when working with providers defined in different files. Trying to properly manage your imports in these situations can be complicated, which defeats the purpose of this package.
+
+To get around this it is possible to declare your generic interface as part of the global scope. While in a general sense using the global scope is a touchy practice, I have found this to be a reasonable place to use it. Once created, in each of your files that global interface can be merged with a local interface of the same name and a new property (See [Merging Interfaces](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#merging-interfaces)) effectively allowing you to decentralize your type declarations.
+
+```ts
+// index.ts
+import { Container } from 'diminish'
+import { itemOneProvider } from './itemOne.ts'
+import { itemTwoProvider } from './itemTwo.ts'
+
+declare global {
+  interface Types {}
+  namespace Types {}
+}
+
+const container = new Container<Types>()
+container.register('itemOne', itemOneProvider) // OK
+container.register('itemTwo', itemTwoProvider) // OK
+
+const itemTwo = container.resolve('itemTwo') // OK
+// here itemTwo has type number | Promise<number>
+```
+
+```ts
+// itemOne.ts
+
+declare global {
+  interface Types { itemOne: number }
+  namespace Types { type itemOne = number }
+}
+
+export function itemOneProvider() : number{
+  return 10
+}
+```
+
+```ts
+// itemTwo.ts
+
+declare global {
+  interface Types { itemTwo: number }
+  namespace Types { type itemTwo = number }
+}
+
+export function itemTwoProvider({ itemOne } : Types) : number {
+  // here itemOne will correctly have type
+  return itemOne + 10
+}
+
+// OR
+
+export function itemTwoProvider(itemOne : Types.itemOne) : number {
+  // here itemOne will correctly have type
+  return itemOne + 10
+}
 ```
