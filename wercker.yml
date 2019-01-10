@@ -22,8 +22,8 @@ release:
   steps:
     - npm-install
     - script:
-      name: compile
-      code: tsc
+      name: build
+      code: npm run build
     - script:
       name: npm publish
       code: npm publish
