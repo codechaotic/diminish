@@ -23,7 +23,6 @@
       ".tsx"
     ],
     "exclude": [
-      "src/**/*.js*",
       "src/**/*.d.ts*",
       "src/**/*.spec.ts"
     ]
