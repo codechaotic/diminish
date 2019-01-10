@@ -44,7 +44,6 @@
   "dependencies": {
     "@types/esprima": "^4.0.2",
     "@types/node": "^10.12.18",
-    "@types/reflect-metadata": "^0.1.0",
     "esprima": "^4.0.1",
     "reflect-metadata": "^0.1.12"
   },
