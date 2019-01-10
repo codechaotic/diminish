@@ -1,60 +1,29 @@
-lint:
-  box: node:6.4.0-slim
+test:
+  box: node:6.4.0
   steps:
     - npm-install
+    - npm-test
     - script:
       name: lint
       code: npm run lint
 
 coverage:
-  box: node:6.4.0-slim
+  box: node:6.4.0
   steps:
     - npm-install
     - npm-test
     - script:
-      name: lint
+      name: coverage
       code: |
-        npm test
         npm run coverage
 
-test.6.4.0:
-  box: node:6.4.0-slim
-  steps:
-    - npm-install
-    - npm-test
-
-test.6:
-  box: node:6-slim
-  steps:
-    - npm-install
-    - npm-test
-
-test.7:
-  box: node:7-slim
-  steps:
-    - npm-install
-    - npm-test
-
-test.8:
-  box: node:8-slim
-  steps:
-    - npm-install
-    - npm-test
-
-test.9:
-  box: node:9-slim
-  steps:
-    - npm-install
-    - npm-test
-
-test.10:
-  box: node:10-slim
-  steps:
-    - npm-install
-    - npm-test
-
 release:
+  box: node:6.4.0
   steps:
+    - npm-install
+    - script:
+      name: compile
+      code: tsc
     - script:
       name: npm publish
       code: npm publish

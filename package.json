@@ -23,7 +23,6 @@
       ".tsx"
     ],
     "exclude": [
-      "src/**/*.js*",
       "src/**/*.d.ts*",
       "src/**/*.spec.ts"
     ]
@@ -44,9 +43,7 @@
   "dependencies": {
     "@types/esprima": "^4.0.2",
     "@types/node": "^10.12.18",
-    "@types/reflect-metadata": "^0.1.0",
-    "esprima": "^4.0.1",
-    "reflect-metadata": "^0.1.12"
+    "esprima": "^4.0.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
