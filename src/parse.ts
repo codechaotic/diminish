@@ -1,5 +1,7 @@
-const { parse } = require('esprima')
-const assert = require('assert')
+/* eslint-disable no-unused-vars */
+
+import { parseScript } from 'esprima'
+import * as assert from 'assert'
 
 const NATIVE_REGEXP = /\{\s*\[native code\]\s*\}/
 
@@ -7,11 +9,11 @@ const NATIVE_REGEXP = /\{\s*\[native code\]\s*\}/
 // Items in the result can be a string, representing an identifier name, or
 // an array of strings, representing identifier names to attach to an object.
 // i.e. if fn = (a, { b }) => {}, extractArgs(fn) -> ['a', ['b']]
-module.exports = function extract (fn) {
+export function parse (fn: Function) : { type: 'class'|'function'|'arrow', args: Array<string|Array<string>> } {
   assert(fn instanceof Function, 'Must be a function or class')
   assert(!NATIVE_REGEXP.test('' + fn), 'Cannot extract from a native function')
 
-  const declaration = extractDeclaration(fn)
+  const declaration = parseDeclaration(fn)
 
   let target = null
   let type = null
@@ -19,8 +21,8 @@ module.exports = function extract (fn) {
     case 'ClassExpression':
       type = 'class'
       for (let f = fn; f instanceof Function; f = Object.getPrototypeOf(f)) {
-        const declaration = extractDeclaration(f)
-        const result = extractClassConstructor(declaration)
+        const declaration = parseDeclaration(f)
+        const result = parseClassConstructor(declaration)
         if (result !== null) {
           target = result
           break
@@ -35,30 +37,28 @@ module.exports = function extract (fn) {
       type = 'arrow'
       target = declaration
       break
-    default:
-      throw new Error('Not a function or class')
   }
 
-  let args
-  if (target !== null) args = extractFunctionArgs(target)
+  let args : any
+  if (target !== null) args = parseFunctionArgs(target)
   else args = []
 
   return { type, args }
 }
 
-function extractDeclaration (fn) {
+export function parseDeclaration (fn : Function) {
   assert(fn instanceof Function, 'Must be a function')
 
-  let script
+  let script : any
 
   // Parsing fn.toString() directly fails for anonymous function definitions.
   // Wrapping it in a pointless assignment ensures it's always parsable
-  try { script = parse('fn=' + fn) } catch (error) {}
+  try { script = parseScript('fn=' + fn) } catch (error) {}
 
   // That can still fail when the function is defined directly on an object,
   // such as { fn() {} }. In this case, the function token needs to be
   // inserted before it's parseable on its own.
-  if (!script) try { script = parse('fn=function ' + fn) } catch (error) {}
+  if (!script) try { script = parseScript('fn=function ' + fn) } catch (error) {}
 
   // That covers all currently known cases, so anything else should be an error
   // If new cases are found, insert them here somewhere.
@@ -69,7 +69,7 @@ function extractDeclaration (fn) {
   return expression.right
 }
 
-function extractFunctionArgs (expression) {
+export function parseFunctionArgs (expression: any) {
   let args = []
   for (const param of expression.params) {
     switch (param.type) {
@@ -83,22 +83,18 @@ function extractFunctionArgs (expression) {
         }
         args.push(properties)
         break
-      default:
-        throw new Error('Unrecognized param')
     }
   }
   return args
 }
 
-function extractClassConstructor (expression) {
+export function parseClassConstructor (expression: any) {
   const { body } = expression.body
   let classConstructor = null
   for (let definition of body) {
-    if (definition.type === 'MethodDefinition') {
-      if (definition.key.name === 'constructor') {
-        classConstructor = definition.value
-        break
-      }
+    if (definition.type === 'MethodDefinition' && definition.key.name === 'constructor') {
+      classConstructor = definition.value
+      break
     }
   }
   return classConstructor
