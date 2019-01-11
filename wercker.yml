@@ -15,7 +15,7 @@ coverage:
     - script:
       name: coverage
       code: |
-        npm run coverage
+        npm run report-coverage
 
 release:
   box: node:6.4.0
