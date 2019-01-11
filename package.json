@@ -35,9 +35,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rimraf src/**/*.d.ts* src/**/*.js*",
+    "clean": "rimraf src/**/*.d.ts* src/**/*.js* coverage",
     "lint": "standard src/**/*.ts",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "coverage": "nyc report --reporter=html && opn ./coverage/index.html",
+    "report-coverage": "nyc report --reporter=text-lcov | coveralls",
     "test": "nyc mocha --opts mocha.opts src/**/*.spec.ts"
   },
   "dependencies": {
