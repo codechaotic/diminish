@@ -2,31 +2,52 @@
 /* eslint-env mocha */
 
 import * as chai from 'chai'
-// import * as sinon from 'sinon'
+import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import * as chaiAsPromised from 'chai-as-promised'
 
-// import { Resolver } from '.'
+import * as Diminish from '.'
 
 chai.use(sinonChai)
 chai.use(chaiAsPromised)
 
-// const expect = chai.expect
+const expect = chai.expect
 
 describe('Resolver', function () {
-  // let parse
-  // let isContainer
+  let parse : typeof Diminish.parse
+  let resolver : Diminish.Resolver
+  let registry : { [key in keyof Diminish.Registry<any>] : sinon.SinonStub }
+  let Registry : typeof Diminish.Registry & sinon.SinonStub
 
-  // beforeEach(function () {
-  //   parse = sinon.stub(Diminish, 'parse')
-  //   isContainer = sinon.stub(Diminish, 'isContainer')
-  // })
+  beforeEach(function () {
+    registry = {
+      get: sinon.stub(),
+      set: sinon.stub(),
+      has: sinon.stub()
+    }
+    Registry = sinon.stub(Diminish, 'Registry') as any
+    Registry.returns(registry)
+  })
 
-  // afterEach(function () {
-  //   parse.restore()
-  //   isContainer.restore()
-  // })
+  afterEach(function () {
+    Registry.restore()
+  })
 
+  describe('#_apply', function () {
+
+  })
+
+  describe('#_resolve', function () {
+
+  })
+
+  describe('#resolve', function () {
+
+  })
+
+  describe('#isCircular', function () {
+
+  })
   // describe('#resolve', function () {
   //   it('should be an async method', async function () {
   //     const type = 'function'

@@ -7,7 +7,6 @@ export type Producer < Result > = Constructor<Result> | Factory<Result> | AsyncF
 export type ProducerObject < ITypes > = {
   [Key in keyof ITypes] : Producer<ITypes[Key]>
 }
-export type ProducerType = 'class'|'function'|'arrow'
 export type LiteralObject < ITypes > = {
   [Key in keyof ITypes] : any
 }

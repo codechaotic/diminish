@@ -6,8 +6,8 @@ import {
   AsyncFactory,
   Constructor,
   Producer,
-  ProducerType,
   Registry,
+  FunctionInfo,
   parse
 } from '.'
 
@@ -15,10 +15,9 @@ export type ResolverObject < ITypes > = {
   [Key in keyof ITypes] : Resolver<ITypes[Key]>
 }
 
-export class Resolver<Result> {
+export class Resolver<Result = any> {
   private _reg: Registry<any>
-  private _type: ProducerType
-  private _args: Array<string | Array<string>>
+  private _info: FunctionInfo
   private _name: string
   private _fn : Producer<Result>
   private _ready : boolean
@@ -26,7 +25,7 @@ export class Resolver<Result> {
   private _value : Result
 
   private _apply (context: any, params: any[]) {
-    switch (this._type) {
+    switch (this._info.type) {
       case 'class':
         const Class = Function.prototype.bind.apply(this._fn, [null].concat(params)) as Constructor<Result>
         return new Class()
@@ -42,7 +41,7 @@ export class Resolver<Result> {
     const params = [] as Array<any>
     const promises = [] as Array<Promise<any>>
 
-    for (const arg of this._args) {
+    for (const arg of this._info.args) {
       if (Array.isArray(arg)) {
         const keys = arg
         const obj = {} as { [x:string]: any }
@@ -82,9 +81,7 @@ export class Resolver<Result> {
   }
 
   constructor (registry: Registry<any>, name: string, fn: Producer<Result>) {
-    const { type, args } = parse(fn)
-    this._type = type
-    this._args = args
+    this._info = parse(fn)
     this._reg = registry
     this._name = name
     this._fn = fn
@@ -94,8 +91,8 @@ export class Resolver<Result> {
   public isCircular (path: Array<string> = []) : boolean {
     if (path.includes(this._name)) return true
 
-    let deps : Array<string> = []
-    for (const arg of this._args) {
+    let deps : string[] = []
+    for (const arg of this._info.args) {
       deps = deps.concat(arg)
     }
 
