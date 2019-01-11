@@ -11,11 +11,11 @@ import * as Diminish from '.'
 chai.use(sinonChai)
 chai.use(chaiAsPromised)
 
-const expect = chai.expect
+// const expect = chai.expect
 
 describe('Resolver', function () {
-  let parse : typeof Diminish.parse
-  let resolver : Diminish.Resolver
+  // let parse : typeof Diminish.parse
+  // let resolver : Diminish.Resolver
   let registry : { [key in keyof Diminish.Registry<any>] : sinon.SinonStub }
   let Registry : typeof Diminish.Registry & sinon.SinonStub
 

@@ -179,7 +179,7 @@ describe('Container', function () {
     it('should execute resolver with a custom context', function () {
       resolver.resolve.resolves(true)
       const context = {}
-      container.invoke(context,  () => {})
+      container.invoke(context, () => {})
       expect(resolver.resolve).to.have.been.calledWith(context)
     })
 

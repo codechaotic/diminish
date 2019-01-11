@@ -89,7 +89,7 @@ export function getConstructorExpression (constructor: Function) : FunctionExpre
   if (typeof constructor !== 'function') {
     throw new Error('Not a Function')
   }
-  
+
   for (let fn = constructor; fn instanceof Function; fn = Object.getPrototypeOf(fn)) {
     const expression = Diminish.getExpression(fn)
     if (expression.type !== 'ClassExpression') {
@@ -111,19 +111,21 @@ export function getConstructorExpression (constructor: Function) : FunctionExpre
 
 export function getArgs (expression: ArrowFunctionExpression | FunctionExpression) {
   let args : FunctionArgs = []
-  if (expression) for (const param of expression.params) {
-    switch (param.type) {
-      case 'Identifier':
-        args.push(param.name)
-        break
-      case 'ObjectPattern':
-        let keys : string[] = []
-        for (const property of param.properties) {
-          const key = property.key as Identifier
-          keys.push(key.name)
-        }
-        args.push(keys)
-        break
+  if (expression) {
+    for (const param of expression.params) {
+      switch (param.type) {
+        case 'Identifier':
+          args.push(param.name)
+          break
+        case 'ObjectPattern':
+          let keys : string[] = []
+          for (const property of param.properties) {
+            const key = property.key as Identifier
+            keys.push(key.name)
+          }
+          args.push(keys)
+          break
+      }
     }
   }
   return args

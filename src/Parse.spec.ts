@@ -35,7 +35,7 @@ describe('Parse', function () {
     })
 
     it('should process an anonymous function', function () {
-      const result = Diminish.getExpression(function() {})
+      const result = Diminish.getExpression(function () {})
       expect(result.type).to.eq('FunctionExpression')
     })
 
@@ -81,14 +81,14 @@ describe('Parse', function () {
     })
 
     it('should return the constructor FunctionExpression', function () {
-      const Class = class { constructor () {} }
+      const Class = class { constructor () { '' } }
       const result = Diminish.getConstructorExpression(Class)
       expect(result).not.to.be.null
       expect(result.type).to.eq('FunctionExpression')
     })
 
     it('should return the parent constructor FunctionExpression', function () {
-      const Parent = class { constructor () {} }
+      const Parent = class { constructor () { '' } }
       const Class = class extends Parent {}
       const result = Diminish.getConstructorExpression(Class)
       expect(result).not.to.be.null
@@ -96,7 +96,7 @@ describe('Parse', function () {
     })
 
     it('should return the grandparent constructor FunctionExpression', function () {
-      const Grandparent = class { constructor () {} }
+      const Grandparent = class { constructor () { '' } }
       const Parent = class extends Grandparent {}
       const Class = class extends Parent {}
       const result = Diminish.getConstructorExpression(Class)
@@ -105,8 +105,8 @@ describe('Parse', function () {
     })
 
     it('should ignore the parent constructor if constructor defined', function () {
-      const Parent = class { constructor () {} }
-      const Class = class extends Parent { constructor (a:any) { super (); a} }
+      const Parent = class { constructor () { '' } }
+      const Class = class extends Parent { constructor (a:any) { super(); a } }
       const result = Diminish.getConstructorExpression(Class)
       expect(result).not.to.be.null
       expect(result.type).to.eq('FunctionExpression')
