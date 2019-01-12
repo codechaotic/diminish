@@ -7,7 +7,7 @@
   "description": "Minimal dependency injection to diminish code complexity",
   "main": "src",
   "types": "src",
-  "author": "Asa Jones <thinkinfractals@gmail.com>",
+  "author": "Asa Jones <thinkinfractals@gmail.com> (https://github.com/codechaotic)",
   "license": "ISC",
   "keywords": [
     "dependency",
@@ -17,6 +17,13 @@
     "ioc",
     "di"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codechaotic/diminish"
+  },
+  "bugs": {
+    "url": "https://github.com/codechaotic/diminish/issues"
+  },
   "nyc": {
     "extension": [
       ".ts",
