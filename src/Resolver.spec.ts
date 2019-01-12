@@ -11,15 +11,21 @@ import * as Diminish from '.'
 chai.use(sinonChai)
 chai.use(chaiAsPromised)
 
-// const expect = chai.expect
+const expect = chai.expect
 
 describe('Resolver', function () {
-  // let parse : typeof Diminish.parse
-  // let resolver : Diminish.Resolver
+  let parse : typeof Diminish.parse & sinon.SinonStub
   let registry : { [key in keyof Diminish.Registry<any>] : sinon.SinonStub }
   let Registry : typeof Diminish.Registry & sinon.SinonStub
 
+  function createResolver (name, producer) {
+    const resolver = new Diminish.Resolver(registry as any, name, producer)
+    registry.get.withArgs(name).returns(resolver)
+    return resolver
+  }
+
   beforeEach(function () {
+    parse = sinon.stub(Diminish, 'parse')
     registry = {
       get: sinon.stub(),
       set: sinon.stub(),
@@ -30,218 +36,233 @@ describe('Resolver', function () {
   })
 
   afterEach(function () {
+    parse.restore()
     Registry.restore()
   })
 
   describe('#_apply', function () {
+    it('should be a method', function () {
+      const resolver = createResolver('x', () => {}) as any
+      expect(resolver._apply).to.be.a('function')
+    })
 
+    it('should call a function with given arguments', function () {
+      parse.returns({ type: 'function', args: [] })
+      let args : any[]
+      const resolver = createResolver('x', (...x: any[]) => { args = x }) as any
+      resolver._apply(null, [1, 2])
+      expect(args).to.deep.eq([1, 2])
+    })
+
+    it('should create call a constructor with given arguments', function () {
+      parse.returns({ type: 'class', args: [] })
+      let args : any[]
+      const resolver = createResolver('x', class { constructor (...x: any[]) { args = x } }) as any
+      resolver._apply(null, [1, 2])
+      expect(args).to.deep.eq([1, 2])
+    })
+
+    it('should call function with a custom context', function () {
+      parse.returns({ type: 'function', args: [] })
+      let context = { value: 10 }
+      let actual : any
+      const resolver = createResolver('x', function () { actual = this }) as any
+      resolver._apply(context, [])
+      expect(actual).to.eq(context)
+    })
+
+    it('should error when calling a constructor with a custom context', function () {
+      parse.returns({ type: 'class', args: [] })
+      let context = { value: 10 }
+      const resolver = createResolver('x', class { constructor () { '' } }) as any
+      expect(() => resolver._apply(context, [])).to.throw('cannot be called with custom context')
+    })
+
+    it('should error when calling an arrow function with a custom context', function () {
+      parse.returns({ type: 'arrow', args: [] })
+      let context = { value: 10 }
+      const resolver = createResolver('x', () => {}) as any
+      expect(() => resolver._apply(context, [])).to.throw('cannot be called with custom context')
+    })
   })
 
   describe('#_resolve', function () {
+    it('should be a method', function () {
+      const resolver = createResolver('x', () => {}) as any
+      expect(resolver._resolve).to.be.a('function')
+    })
 
-  })
+    it('should resolve and inject dependencies', function () {
+      parse.returns({ type: 'function', args: ['a'] })
+      const resolver = createResolver('x', () => {}) as any
+      const _apply = sinon.stub(resolver, '_apply')
+      registry.get.withArgs('a').returns({
+        resolve: sinon.stub().returns(true)
+      })
+      resolver._resolve()
+      expect(_apply).to.have.been.calledWith(null, [true])
+    })
 
-  describe('#resolve', function () {
+    it('should reconstruct deconstructed dependencies', function () {
+      parse.returns({ type: 'function', args: [['a']] })
+      const resolver = createResolver('x', () => {}) as any
+      const _apply = sinon.stub(resolver, '_apply')
+      registry.get.withArgs('a').returns({
+        resolve: sinon.stub().returns(true)
+      })
+      resolver._resolve()
+      expect(_apply).to.have.been.calledWith(null, [{ a: true }])
+    })
 
+    it('should await asynchronous dependencies', async function () {
+      parse.returns({ type: 'function', args: ['a'] })
+      const resolver = createResolver('x', () => {}) as any
+      const _apply = sinon.stub(resolver, '_apply')
+      registry.get.withArgs('a').returns({
+        resolve: sinon.stub().resolves(true)
+      })
+      await resolver._resolve()
+      expect(_apply).to.have.been.calledWith(null, [true])
+    })
+
+    it('should await asynchronouse deconstructed dependencies', async function () {
+      parse.returns({ type: 'function', args: [['a']] })
+      const resolver = createResolver('x', () => {}) as any
+      const _apply = sinon.stub(resolver, '_apply')
+      registry.get.withArgs('a').returns({
+        resolve: sinon.stub().resolves(true)
+      })
+      await resolver._resolve()
+      expect(_apply).to.have.been.calledWith(null, [{ a: true }])
+    })
+
+    it('should return a promise if provider is asynchronous', function () {
+      parse.returns({ type: 'function', args: [] })
+      const resolver = createResolver('x', async () => {}) as any
+      const result = resolver._resolve(null)
+      expect(result).to.be.instanceof(Promise)
+    })
+
+    it('should return a promise if a dependency is asynchronous', function () {
+      parse.returns({ type: 'function', args: ['a'] })
+      const resolver = createResolver('x', () => {}) as any
+      registry.get.withArgs('a').returns({
+        resolve: sinon.stub().resolves(true)
+      })
+      const result = resolver._resolve()
+      expect(result).to.be.instanceof(Promise)
+    })
+
+    it('should call provider with a custom context', function () {
+      parse.returns({ type: 'function', args: [] })
+      const resolver = createResolver('x', () => {}) as any
+      const _apply = sinon.stub(resolver, '_apply')
+      const context = {}
+      resolver._resolve(context)
+      expect(_apply).to.have.been.calledWith(context, [])
+    })
   })
 
   describe('#isCircular', function () {
+    it('should be a method', function () {
+      const resolver = createResolver('x', () => {})
+      expect(resolver.isCircular).to.be.a('function')
+    })
 
+    it('should return true if search path includes self', function () {
+      parse.returns({ type: 'function', args: ['x'] })
+      const resolver = createResolver('x', () => {})
+      expect(resolver.isCircular(['x'])).to.be.true
+    })
+
+    it('should return true if dependencies includes self', function () {
+      parse.returns({ type: 'function', args: ['x'] })
+      const resolver = createResolver('x', () => {})
+      expect(resolver.isCircular([])).to.be.true
+    })
+
+    it('should return true a dependency is circular', function () {
+      parse.onFirstCall().returns({ type: 'function', args: ['y'] })
+      parse.onSecondCall().returns({ type: 'function', args: ['y'] })
+      const firstResolver = createResolver('x', () => {})
+      const secondResolver = createResolver('y', () => {})
+      expect(secondResolver.isCircular()).to.be.true
+      expect(firstResolver.isCircular()).to.be.true
+    })
+
+    it('should return false if not circular', function () {
+      parse.returns({ type: 'function', args: ['x', 'x'] })
+      const resolver = createResolver('y', () => {})
+      expect(resolver.isCircular()).to.be.false
+    })
   })
-  // describe('#resolve', function () {
-  //   it('should be an async method', async function () {
-  //     const type = 'function'
-  //     const args = []
-  //     const fn = sinon.stub()
-  //     parse.returns({ type, args })
-  //     isContainer.returns(true)
-  //     const resolver = new Resolver(fn)
-  //
-  //     expect(resolver.resolve).to.be.a('function')
-  //     const promise = resolver.resolve()
-  //     expect(promise).to.be.instanceof(Promise)
-  //     await promise
-  //   })
-  //
-  //   it('should resolve against the provided container', async function () {
-  //     const type = 'function'
-  //     const args = ['a']
-  //     const fn = sinon.stub()
-  //     const container = { resolve: sinon.stub() }
-  //
-  //     parse.returns({ type, args })
-  //     isContainer.returns(true)
-  //     container.resolve.withArgs('a').resolves(0xA)
-  //
-  //     const resolver = new Resolver(fn)
-  //
-  //     await resolver.resolve(container)
-  //     expect(fn).to.have.been.calledWith(0xA)
-  //   })
-  //
-  //   it('should get value for functions by executing them', async function () {
-  //     const type = 'function'
-  //     const args = []
-  //     const fn = sinon.stub()
-  //     const container = { resolve: sinon.stub() }
-  //
-  //     parse.returns({ type, args })
-  //     isContainer.returns(true)
-  //     fn.returns(0xA)
-  //
-  //     const resolver = new Resolver(fn)
-  //
-  //     expect(await resolver.resolve(container)).to.eq(0xA)
-  //   })
-  //
-  //   it('should get value for arrow functinos by executing them', async function () {
-  //     const type = 'arrow'
-  //     const args = []
-  //     const fn = sinon.stub()
-  //     const container = { resolve: sinon.stub() }
-  //
-  //     parse.returns({ type, args })
-  //     isContainer.returns(true)
-  //     fn.returns(0xA)
-  //
-  //     const resolver = new Resolver(fn)
-  //
-  //     expect(await resolver.resolve(container)).to.eq(0xA)
-  //   })
-  //
-  //   it('should get value for classes by instantiating them', async function () {
-  //     const type = 'class'
-  //     const args = []
-  //     const construct = sinon.stub()
-  //     const Class = class { constructor () { construct() } }
-  //     const container = { resolve: sinon.stub() }
-  //
-  //     parse.returns({ type, args })
-  //     isContainer.returns(true)
-  //
-  //     const resolver = new Resolver(Class)
-  //
-  //     expect(await resolver.resolve(container)).to.deep.equal({})
-  //     expect(construct).to.have.been.called
-  //   })
-  //
-  //   it('should bind a context to a function if provided', async function () {
-  //     const type = 'function'
-  //     const args = []
-  //     const fn = sinon.stub()
-  //     const container = { resolve: sinon.stub() }
-  //     const context = {}
-  //
-  //     parse.returns({ type, args })
-  //     isContainer.returns(true)
-  //
-  //     const resolver = new Resolver(fn)
-  //
-  //     await resolver.resolve(container, context)
-  //     expect(fn).to.have.been.calledOn(context)
-  //   })
-  //
-  //   it('should error when context is provided to arrow function', async function () {
-  //     const type = 'arrow'
-  //     const args = []
-  //     const fn = sinon.stub()
-  //     const container = { resolve: sinon.stub() }
-  //     const context = {}
-  //
-  //     parse.returns({ type, args })
-  //     isContainer.returns(true)
-  //     fn.returns(0xA)
-  //
-  //     const resolver = new Resolver(fn)
-  //
-  //     const promise = resolver.resolve(container, context)
-  //     expect(promise).to.be.rejectedWith('Cannot apply custom context')
-  //   })
-  //
-  //   it('should error with an unknown type', async function () {
-  //     const type = 'unknown'
-  //     const args = []
-  //     const fn = sinon.stub()
-  //     const container = { resolve: sinon.stub() }
-  //
-  //     parse.returns({ type, args })
-  //     isContainer.returns(true)
-  //
-  //     const resolver = new Resolver(fn)
-  //
-  //     const promise = resolver.resolve(container, context)
-  //     expect(promise).to.be.rejectedWith('Unknown type')
-  //   })
-  //
-  //   it('should reconstruct dereferenced parameters', async function () {
-  //     const type = 'function'
-  //     const args = [['a']]
-  //     const fn = sinon.stub()
-  //     const container = { resolve: sinon.stub() }
-  //
-  //     parse.returns({ type, args })
-  //     isContainer.returns(true)
-  //     container.resolve.withArgs('a').resolves(0xA)
-  //
-  //     const resolver = new Resolver(fn)
-  //
-  //     await resolver.resolve(container)
-  //     expect(fn).to.have.been.calledWith({ a: 0xA })
-  //   })
-  //
-  //   it('should resolve async dependencies', async function () {
-  //     const type = 'function'
-  //     const args = ['a']
-  //     const fn = sinon.stub()
-  //     const container = { resolve: sinon.stub() }
-  //
-  //     parse.returns({ type, args })
-  //     isContainer.returns(true)
-  //     container.resolve.withArgs('a').resolves(0xA)
-  //
-  //     const resolver = new Resolver(fn)
-  //
-  //     await resolver.resolve(container)
-  //     expect(fn).to.have.been.calledWith(0xA)
-  //   })
-  //
-  //   it('should cache the resolved value', async function () {
-  //     const type = 'function'
-  //     const args = []
-  //     const fn = sinon.stub()
-  //     const container = { resolve: sinon.stub() }
-  //
-  //     parse.returns({ type, args })
-  //     isContainer.returns(true)
-  //
-  //     const resolver = new Resolver(fn)
-  //
-  //     await resolver.resolve(container)
-  //     expect(fn).to.have.been.called
-  //     fn.resetHistory()
-  //     await resolver.resolve(container)
-  //     expect(fn).not.to.have.been.called
-  //   })
-  // })
 
-  // describe('#reset', function () {
-  //   it('should clear the internal cache', async function () {
-  //     const type = 'function'
-  //     const args = []
-  //     const fn = sinon.stub()
-  //     const container = { resolve: sinon.stub() }
-  //
-  //     parse.returns({ type, args })
-  //     isContainer.returns(true)
-  //
-  //     const resolver = new Resolver(fn)
-  //
-  //     await resolver.resolve(container)
-  //     expect(fn).to.have.been.called
-  //     fn.resetHistory()
-  //     resolver.reset()
-  //     await resolver.resolve(container)
-  //     expect(fn).to.have.been.called
-  //   })
-  // })
+  describe('#resolve', function () {
+    it('should be a method', function () {
+      const resolver = createResolver('x', () => {})
+      expect(resolver.resolve).to.be.a('function')
+    })
+
+    it('should error if there are circular dependencies', function () {
+      const resolver = createResolver('x', () => {})
+      const isCircular = sinon.stub(resolver, 'isCircular')
+      isCircular.returns(true)
+      expect(() => resolver.resolve()).to.throw('has circular dependencies')
+    })
+
+    it('should return cached value if already resolved', function () {
+      const resolver = createResolver('x', () => {})
+      const isCircular = sinon.stub(resolver, 'isCircular')
+      isCircular.returns(false)
+
+      const exposed : any = resolver
+      exposed._ready = true
+      exposed._value = true
+
+      expect(resolver.resolve()).to.be.true
+    })
+
+    it('should return promise if async resolution already in progress', async function () {
+      const resolver = createResolver('x', () => {})
+      const isCircular = sinon.stub(resolver, 'isCircular')
+      isCircular.returns(false)
+
+      const exposed : any = resolver
+      exposed._promise = Promise.resolve(true)
+
+      const result = resolver.resolve()
+      expect(result).to.be.instanceof(Promise)
+
+      expect(await result).to.be.true
+    })
+
+    it('should cache and return a resolved value', function () {
+      const resolver = createResolver('x', () => {})
+      const isCircular = sinon.stub(resolver, 'isCircular')
+      isCircular.returns(false)
+
+      const exposed : any = resolver
+      const _resolve : sinon.SinonStub<any[], any> = sinon.stub(exposed, '_resolve')
+      _resolve.returns(true)
+
+      const result = resolver.resolve()
+      expect(result).to.be.true
+      expect((resolver as any)._ready).to.be.true
+      expect(exposed._value).to.be.true
+    })
+
+    it('should create a store a promise for async values', async function () {
+      const resolver = createResolver('x', () => {})
+      const isCircular = sinon.stub(resolver, 'isCircular')
+      isCircular.returns(false)
+
+      const exposed : any = resolver
+      const _resolve : sinon.SinonStub<any[], any> = sinon.stub(exposed, '_resolve')
+      _resolve.resolves(true)
+
+      const result = resolver.resolve()
+      expect(result).to.be.instanceof(Promise)
+      expect(exposed._promise).to.equal(result)
+    })
+  })
 })

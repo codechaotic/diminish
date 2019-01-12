@@ -27,13 +27,15 @@ export class Resolver<Result = any> {
   private _apply (context: any, params: any[]) {
     switch (this._info.type) {
       case 'class':
+        assert(context === null, 'constructor cannot be called with custom context')
         const Class = Function.prototype.bind.apply(this._fn, [null].concat(params)) as Constructor<Result>
         return new Class()
-      case 'function':
       case 'arrow':
+        assert(context === null, 'arrow function cannot be called with custom context')
+        /* falls through */
+      case 'function':
         const Factory = this._fn as Factory<Result> | AsyncFactory<Result>
         return Factory.apply(context, params)
-      default: throw Error('Unknown type')
     }
   }
 
@@ -86,6 +88,8 @@ export class Resolver<Result = any> {
     this._name = name
     this._fn = fn
     this._ready = false
+    this._value = null
+    this._promise = null
   }
 
   public isCircular (path: Array<string> = []) : boolean {
@@ -124,20 +128,22 @@ export class Resolver<Result = any> {
     else if (this._promise) return this._promise
     else {
       const result = this._resolve(context)
-
       if (result instanceof Promise) {
         this._promise = result.then(
           value => {
+            this._ready = true
             this._value = value
-            delete this._promise
             return value
           }
         )
-      } else {
-        this._value = result
-      }
 
-      return result
+        return this._promise
+      } else {
+        this._ready = true
+        this._value = result
+
+        return this._value
+      }
     }
   }
 }
