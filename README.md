@@ -248,7 +248,7 @@ declare global {
   namespace Types { type itemOne = number }
 }
 
-export function itemOneProvider() : number{
+export function itemOneProvider() : number {
   return 10
 }
 ```
