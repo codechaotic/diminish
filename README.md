@@ -273,3 +273,35 @@ export function itemTwoProvider(itemOne : Types.itemOne) : number {
   return itemOne + 10
 }
 ```
+
+### Invoked Providers
+
+It is possible to inject dependencies into a provider without registering it by calling the `invoke` method. This method takes any valid provider and immediately resolves it without ever registering it with the container.
+
+```ts
+container.literal('itemOne', 10)
+
+const result = container.invoke(({ itemOne }) => {
+  return 10 + itemOne
+})
+
+// result === 20
+```
+
+It is possible to provide a custom context for executing the provider.
+
+```ts
+const context = { prop: 10 }
+const result = container.invoke(context, function () {
+  return this.prop
+})
+// result === 10
+```
+
+This will **ONLY** work with standard functions. Trying to set a custom context for either a class constructor or an arrow function will throw an error.
+
+```ts
+const context = { prop: 10 }
+const result = container.invoke(context, () => {}) // ERROR
+const result = container.invoke(context, class {}) // ERROR
+```
