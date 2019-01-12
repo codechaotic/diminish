@@ -10,6 +10,8 @@
   "author": "Asa Jones <thinkinfractals@gmail.com> (https://github.com/codechaotic)",
   "license": "ISC",
   "keywords": [
+    "container",
+    "typescript",
     "dependency",
     "injection",
     "inversion",
