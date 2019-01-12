@@ -51,8 +51,10 @@
   "dependencies": {
     "@types/esprima": "^4.0.2",
     "@types/estree": "0.0.39",
+    "@types/fs-extra": "^5.0.4",
     "@types/node": "^10.12.18",
-    "esprima": "^4.0.1"
+    "esprima": "^4.0.1",
+    "fs-extra": "^7.0.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
