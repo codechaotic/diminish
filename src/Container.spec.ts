@@ -234,7 +234,7 @@ describe('Container', function () {
 
     it('should register raw modules in the default loader', async function () {
       loader.restore()
-      Diminish.DefaultImportOptions.loader.call(container, { x: () => 10 })
+      Diminish.DefaultImportOptions.loader.call(null, container, { x: () => 10 })
 
       expect(registry.set).to.have.been.calledWith('x', resolver)
     })
