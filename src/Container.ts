@@ -15,7 +15,7 @@ import {
 
 const KEY_REGEX = /[a-zA-Z_$][0-9a-zA-Z_$]*/
 
-export type ImportLoader = (this: Container, module: any) => void
+export type ImportLoader = (container: Container, module: any) => void
 export type ImportOptions = {
   include?: string | string[]
   exclude?: string | string[]
@@ -35,8 +35,8 @@ export const DefaultImportOptions : ImportOptions = {
   include: [],
   exclude: [],
   cwd: process.cwd(),
-  loader: function (this: Container, module: any) {
-    this.register(module)
+  loader: (container: Container, module: any) => {
+    container.register(module)
   }
 }
 
