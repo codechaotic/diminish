@@ -7,9 +7,11 @@
   "description": "Minimal dependency injection to diminish code complexity",
   "main": "src",
   "types": "src",
-  "author": "Asa Jones <thinkinfractals@gmail.com>",
+  "author": "Asa Jones <thinkinfractals@gmail.com> (https://github.com/codechaotic)",
   "license": "ISC",
   "keywords": [
+    "container",
+    "typescript",
     "dependency",
     "injection",
     "inversion",
@@ -17,6 +19,13 @@
     "ioc",
     "di"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codechaotic/diminish"
+  },
+  "bugs": {
+    "url": "https://github.com/codechaotic/diminish/issues"
+  },
   "nyc": {
     "extension": [
       ".ts",
@@ -44,8 +53,10 @@
   "dependencies": {
     "@types/esprima": "^4.0.2",
     "@types/estree": "0.0.39",
+    "@types/glob": "^7.1.1",
     "@types/node": "^10.12.18",
-    "esprima": "^4.0.1"
+    "esprima": "^4.0.1",
+    "glob-promise": "^3.4.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",

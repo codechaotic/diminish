@@ -1,6 +1,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-dupe-class-members */
 
+import * as glob from 'glob-promise'
+import { IOptions } from 'glob'
+import * as path from 'path'
 import {
   LiteralObject,
   ProducerObject,
@@ -11,6 +14,31 @@ import {
 } from '.'
 
 const KEY_REGEX = /[a-zA-Z_$][0-9a-zA-Z_$]*/
+
+export type ImportLoader = (container: Container, module: any) => void
+export type ImportOptions = {
+  include?: string | string[]
+  exclude?: string | string[]
+  cwd?: string
+  loader?: ImportLoader
+}
+
+/* istanbul ignore next */
+// Ignore these rows when calculating coverage. This is used to allow mocking
+// the import and glob functions in tests.
+export const Module = {
+  load: (module:string) => import(module),
+  find: (pattern:string, options: IOptions) => glob(pattern, options)
+}
+
+export const DefaultImportOptions : ImportOptions = {
+  include: [],
+  exclude: [],
+  cwd: process.cwd(),
+  loader: (container: Container, module: any) => {
+    container.register(module)
+  }
+}
 
 export class Container<ITypes = any> {
   private _registry = new Registry<ITypes>()
@@ -107,5 +135,59 @@ export class Container<ITypes = any> {
 
     const resolver = new Resolver<Result>(this._registry, '#', fn)
     return resolver.resolve(context)
+  }
+
+  public async import (pattern: string | string[]) : Promise<void>
+  public async import (pattern: string | string[], options: ImportOptions & { include?: never }) : Promise<void>
+  public async import (options: ImportOptions) : Promise<void>
+  public async import (...args: any[]) : Promise<void> {
+    const options = {} as ImportOptions
+    const defaults = DefaultImportOptions
+
+    switch (args.length) {
+      case 1:
+        if (typeof args[0] === 'string') options.include = [args[0]]
+        else if (Array.isArray(args[0])) options.include = args[0]
+        else if (args[0] && args[0] instanceof Object) Object.assign(options, args[0])
+        else throw new Error('Requires either a pattern, array of patterns, or options object')
+        break
+      case 2:
+        if (typeof args[0] === 'string') options.include = [args[0]]
+        else if (Array.isArray(args[0])) options.include = args[0]
+        else throw new Error('First argument must be a pattern or array of patterns')
+
+        if (args[1] && args[1] instanceof Object) Object.assign(options, args[1])
+        else throw new Error('Second argument must be an options object')
+        break
+      default: throw new Error(`Expected 1 or 2 arguments. Got ${args.length}`)
+    }
+
+    const include : string[] = [].concat(options.include || defaults.include)
+    const ignore : string[] = [].concat(options.exclude || defaults.exclude)
+    const loader = options.loader || defaults.loader
+    const cwd = options.cwd || defaults.cwd
+
+    if (include.length === 0) {
+      throw new Error('Must provide at least one include pattern')
+    }
+
+    if (include.some(pattern => typeof pattern !== 'string')) {
+      throw new Error('Patterns must be strings')
+    }
+
+    const files = []
+    for (const pattern of include) {
+      const matches = await Module.find(pattern, { cwd, ignore, nodir: true })
+      for (const match of matches) files.push(path.resolve(cwd, match))
+    }
+
+    for (const file of files) {
+      try {
+        const module = await Module.load(file)
+        await loader.call(this, module)
+      } catch (error) {
+        throw new Error(`Failed to load module ${file}: ${error.message}`)
+      }
+    }
   }
 }

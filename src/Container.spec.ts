@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-env mocha */
 
+import * as path from 'path'
 import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
@@ -189,6 +190,75 @@ describe('Container', function () {
       expect(() => invoke(null)).to.throw('Expected arg 1 to be a function or class')
       expect(() => invoke(null, null)).to.throw('Expected arg 2 to be a function or class')
       expect(() => invoke(null, null, null)).to.throw('Expected 1 or 2 arguments')
+    })
+  })
+
+  describe('#import', function () {
+    let fake : Object
+    let find : sinon.SinonStub
+    let load : sinon.SinonStub
+    let loader : sinon.SinonStub
+
+    beforeEach(function () {
+      fake = {}
+      find = sinon.stub(Diminish.Module, 'find').resolves(['file.js'])
+      load = sinon.stub(Diminish.Module, 'load').resolves(fake)
+      loader = sinon.stub(Diminish.DefaultImportOptions, 'loader')
+    })
+
+    afterEach(function () {
+      find.restore()
+      load.restore()
+      loader.restore()
+    })
+
+    it('should be a method', function () {
+      expect(container.import).to.be.a('function')
+    })
+
+    it('should load modules using the default loader', async function () {
+      await container.import('fake/*.js')
+
+      expect(find).to.have.been.calledWith('fake/*.js')
+      expect(load).to.have.been.calledWith(path.resolve('file.js'))
+      expect(loader).to.have.been.calledWith(fake)
+    })
+
+    it('should allow overriding the loader method', async function () {
+      await container.import('fake/*.js', { loader })
+
+      expect(find).to.have.been.calledWith('fake/*.js')
+      expect(load).to.have.been.calledWith(path.resolve('file.js'))
+      expect(loader).to.have.been.calledWith(fake)
+    })
+
+    it('should register raw modules in the default loader', async function () {
+      loader.restore()
+      Diminish.DefaultImportOptions.loader.call(null, container, { x: () => 10 })
+
+      expect(registry.set).to.have.been.calledWith('x', resolver)
+    })
+
+    it('should error on bad module', async function () {
+      load.rejects(new Error('Bad'))
+
+      await expect(container.import('fake/*.js')).to.be.rejected
+    })
+
+    it('should error with invalid pattern type', async function () {
+      await expect(container.import(null)).to.be.rejected
+      await expect(container.import([null])).to.be.rejected
+      await expect(container.import({ include: null })).to.be.rejected
+      await expect(container.import(null, {})).to.be.rejected
+      await expect(container.import([null], {})).to.be.rejected
+      await expect(container.import([null], {})).to.be.rejected
+      await expect(container.import('fake.js', null)).to.be.rejected
+    })
+
+    it('should error on invalid call signature', async function () {
+      let invoke = container.import.bind(container) as Function
+      await expect(invoke()).to.be.rejected
+      await expect(invoke(null, null, null)).to.be.rejected
     })
   })
 })

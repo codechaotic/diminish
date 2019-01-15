@@ -248,7 +248,7 @@ declare global {
   namespace Types { type itemOne = number }
 }
 
-export function itemOneProvider() : number{
+export function itemOneProvider() : number {
   return 10
 }
 ```
@@ -304,4 +304,59 @@ This will **ONLY** work with standard functions. Trying to set a custom context 
 const context = { prop: 10 }
 const result = container.invoke(context, () => {}) // ERROR
 const result = container.invoke(context, class {}) // ERROR
+```
+
+### Dynamic imports
+
+When a project contains many complex providers it becomes convenient to dynamically load them at run-time. To make this easier Diminish includes an `import` method on the container. This method will grab files based on a glob or a list of globs.
+
+```ts
+// load modules from src or lib
+await container.import('(src|lib)/**.js')
+
+// OR
+
+await container.import([
+  'src/**.js',
+  'lib/**.js'
+])
+```
+
+By default this will call container.register on the exported object from each file. To set this up in each file, just export the desired provider with the desired name.
+
+```ts
+declare global {
+  interface Types { itemOne: itemOneProvider }
+  namespace Types { type itemOne = itemOneProvider }
+}
+
+function itemOneProvider () {
+  return 10
+}
+
+// The exports object will be { itemOne: itemOneProvider }
+export let itemOne = itemOneProvider
+```
+
+You may customize the loading behavior by giving a custom loader function to the `import` method. This function will called for each found file with the container and imported module as arguments.
+
+```ts
+// Change loader to add module exports as literals
+await container.import('src/**.js', {
+  loader: (container: Container, module: any) => {
+    container.literal(module)
+  }
+})
+```
+
+A glob or and array of globs to ignore can also be given in the options object.
+
+```ts
+await container.import('src/**.js', { exclude: 'src/**.spec.js' })
+```
+
+Finally, the relative directory to use for resolving module paths can be set using the `cwd` option.
+
+```ts
+await container.import('src/**.js', { cwd: __dirname })
 ```
