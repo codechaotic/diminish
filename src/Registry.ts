@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import { Resolver } from '.'
 
 export class Registry<ITypes> {
