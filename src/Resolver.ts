@@ -1,19 +1,12 @@
 /* eslint-disable no-unused-vars */
 
 import * as assert from 'assert'
-import {
-  Factory,
-  AsyncFactory,
-  Constructor,
-  Producer,
-  Registry,
-  FunctionInfo,
-  parse
-} from '.'
+import { Registry, FunctionInfo, parse } from '.'
 
-export type ResolverObject < ITypes > = {
-  [Key in keyof ITypes] : Resolver<ITypes[Key]>
-}
+export type Constructor < Result > = new (...args: any[]) => Result
+export type Factory < Result > = (...args: any[]) => Result
+export type AsyncFactory < Result > = (...args: any[]) => Promise<Result>
+export type Producer < Result > = Constructor<Result> | Factory<Result> | AsyncFactory<Result>
 
 export class Resolver<Result = any> {
   private _reg: Registry<any>

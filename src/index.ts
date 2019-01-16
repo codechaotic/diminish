@@ -1,4 +1,3 @@
-export * from './Types'
 export * from './Parse'
 export * from './Resolver'
 export * from './Registry'

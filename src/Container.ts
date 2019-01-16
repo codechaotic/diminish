@@ -1,19 +1,24 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-dupe-class-members */
 
+import * as path from 'path'
 import * as glob from 'glob-promise'
 import { IOptions } from 'glob'
-import * as path from 'path'
-import {
-  LiteralObject,
-  ProducerObject,
-  Producer,
-  ResolverObject,
-  Resolver,
-  Registry
-} from '.'
+import { Producer, Resolver, Registry } from '.'
 
 const KEY_REGEX = /[a-zA-Z_$][0-9a-zA-Z_$]*/
+
+export type ProducerObject < ITypes > = {
+  [Key in keyof ITypes] : Producer<ITypes[Key]>
+}
+
+export type LiteralObject < ITypes > = {
+  [Key in keyof ITypes] : ITypes[Key]
+}
+
+export type ResolverObject < ITypes > = {
+  [Key in keyof ITypes] : Resolver<ITypes[Key]>
+}
 
 export type ImportLoader = (container: Container, module: any) => void
 export type ImportOptions = {
@@ -43,14 +48,14 @@ export const DefaultImportOptions : ImportOptions = {
 export class Container<ITypes = any> {
   private _registry = new Registry<ITypes>()
 
-  public register (obj: ProducerObject<ITypes>) : void
+  public register (obj: Partial<ProducerObject<ITypes>>) : void
   public register<Key extends keyof ITypes> (key: Key, producer: Producer<ITypes[Key]>) : void
   public register (...args: any[]) : void {
-    let obj : ProducerObject<ITypes>
+    let obj : Partial<ProducerObject<ITypes>>
 
     switch (args.length) {
       case 1: obj = args[0]; break
-      case 2: obj = { [args[0]]: args[1] } as ProducerObject<ITypes>; break
+      case 2: obj = { [args[0]]: args[1] } as Partial<ProducerObject<ITypes>>; break
       default: throw new Error(`Expected 1 or 2 arguments. Got ${args.length}`)
     }
 
@@ -77,14 +82,14 @@ export class Container<ITypes = any> {
     }
   }
 
-  public literal (obj: LiteralObject<ITypes>) : void
+  public literal (obj: Partial<LiteralObject<ITypes>>) : void
   public literal<Key extends keyof ITypes> (key: Key, value: ITypes[Key]) : void
   public literal (...args: any[]) : void {
-    let obj : LiteralObject<ITypes>
+    let obj : Partial<LiteralObject<ITypes>>
 
     switch (args.length) {
       case 1: obj = args[0]; break
-      case 2: obj = { [args[0]]: args[1] } as LiteralObject<ITypes>; break
+      case 2: obj = { [args[0]]: args[1] } as Partial<LiteralObject<ITypes>>; break
       default: throw new Error(`Expected 1 or 2 arguments. Got ${args.length}`)
     }
 
