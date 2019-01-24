@@ -1,14 +1,6 @@
 /* eslint-disable no-unused-vars */
 
 import { parseScript } from 'esprima'
-import {
-  Program,
-  Identifier,
-  FunctionExpression,
-  ArrowFunctionExpression,
-  ExpressionStatement,
-  AssignmentExpression
-} from 'estree'
 import * as Diminish from '.'
 import * as assert from 'assert'
 
@@ -52,7 +44,7 @@ export function parse (fn: Function) : FunctionInfo {
 }
 
 export function getExpression (fn : Function) {
-  let program : Program
+  let program
 
   // Parsing fn.toString() directly fails for anonymous function definitions.
   // Wrapping it in a pointless assignment ensures it's always parsable
@@ -70,8 +62,8 @@ export function getExpression (fn : Function) {
   // Extract the function declaration from the assignment
   const body = program.body
 
-  const first = body[0] as ExpressionStatement
-  const expression = first.expression as AssignmentExpression
+  const first = body[0]
+  const expression = first.expression
 
   const func = expression.right
   if (func.type !== 'FunctionExpression') {
@@ -85,7 +77,7 @@ export function getExpression (fn : Function) {
   return func
 }
 
-export function getConstructorExpression (constructor: Function) : FunctionExpression {
+export function getConstructorExpression (constructor: Function) {
   if (typeof constructor !== 'function') {
     throw new Error('Not a Function')
   }
@@ -99,7 +91,7 @@ export function getConstructorExpression (constructor: Function) : FunctionExpre
     const classBody = expression.body
     const definitions = classBody.body
     for (let definition of definitions) {
-      const key = definition.key as Identifier
+      const key = definition.key
       if (key.name === 'constructor') {
         return definition.value
       }
@@ -109,7 +101,7 @@ export function getConstructorExpression (constructor: Function) : FunctionExpre
   return null
 }
 
-export function getArgs (expression: ArrowFunctionExpression | FunctionExpression) {
+export function getArgs (expression: any) {
   let args : FunctionArgs = []
   if (expression) {
     for (const param of expression.params) {
@@ -120,7 +112,7 @@ export function getArgs (expression: ArrowFunctionExpression | FunctionExpressio
         case 'ObjectPattern':
           let keys : string[] = []
           for (const property of param.properties) {
-            const key = property.key as Identifier
+            const key = property.key
             keys.push(key.name)
           }
           args.push(keys)
