@@ -2,11 +2,9 @@
   "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "Node",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "sourceMap": true,
-    "target": "ES6",
-    "lib": ["ES7"],
+    "target": "es6",
+    "lib": ["es7"],
     "declaration": true,
     "declarationMap": true
   },

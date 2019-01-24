@@ -200,7 +200,7 @@ describe('Container', function () {
     let loader : sinon.SinonStub
 
     beforeEach(function () {
-      fake = {}
+      fake = { fake: true }
       find = sinon.stub(Diminish.Module, 'find').resolves(['file.js'])
       load = sinon.stub(Diminish.Module, 'load').resolves(fake)
       loader = sinon.stub(Diminish.DefaultImportOptions, 'loader')
@@ -221,7 +221,7 @@ describe('Container', function () {
 
       expect(find).to.have.been.calledWith('fake/*.js')
       expect(load).to.have.been.calledWith(path.resolve('file.js'))
-      expect(loader).to.have.been.calledWith(fake)
+      expect(loader).to.have.been.calledWith(container, fake)
     })
 
     it('should allow overriding the loader method', async function () {
@@ -229,12 +229,12 @@ describe('Container', function () {
 
       expect(find).to.have.been.calledWith('fake/*.js')
       expect(load).to.have.been.calledWith(path.resolve('file.js'))
-      expect(loader).to.have.been.calledWith(fake)
+      expect(loader).to.have.been.calledWith(container, fake)
     })
 
     it('should register raw modules in the default loader', async function () {
       loader.restore()
-      Diminish.DefaultImportOptions.loader.call(null, container, { x: () => 10 })
+      Diminish.DefaultImportOptions.loader(container, { x: () => 10 })
 
       expect(registry.set).to.have.been.calledWith('x', resolver)
     })
