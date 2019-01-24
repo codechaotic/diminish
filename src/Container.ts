@@ -2,8 +2,7 @@
 /* eslint-disable no-dupe-class-members */
 
 import * as path from 'path'
-import * as glob from 'glob-promise'
-import { IOptions } from 'glob'
+import * as glob from 'glob'
 import { Producer, Resolver, Registry } from '.'
 
 const KEY_REGEX = /[a-zA-Z_$][0-9a-zA-Z_$]*/
@@ -33,7 +32,13 @@ export type ImportOptions = {
 // the import and glob functions in tests.
 export const Module = {
   load: (module:string) => import(module),
-  find: (pattern:string, options: IOptions) => glob(pattern, options)
+  find: (pattern:string, options: glob.IOptions) => {
+    return new Promise<string[]>((resolve, reject) => {
+      glob(pattern, options, (err, matches) => {
+        err ? reject(err) : resolve(matches)
+      })
+    })
+  }
 }
 
 export const DefaultImportOptions : ImportOptions = {
