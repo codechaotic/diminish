@@ -189,7 +189,7 @@ export class Container<ITypes = any> {
     for (const file of files) {
       try {
         const module = await Module.load(file)
-        await loader.call(this, module)
+        await loader(this, module)
       } catch (error) {
         throw new Error(`Failed to load module ${file}: ${error.message}`)
       }
