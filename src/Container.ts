@@ -201,7 +201,7 @@ export class Container<ITypes = any> {
     }
   }
 
-  public isRegistered <Key extends keyof ITypes>  (key: Key) {
+  public isRegistered <Key extends keyof ITypes> (key: Key) {
     if (!KEY_REGEX.test(key as string)) {
       throw new Error(`Error while checking key '${key}': Invalid Key`)
     }
