@@ -3,6 +3,7 @@ type/
 node_modules/
 coverage/
 .nyc_output/
+.vscode/
 *.js
 *.js.map
 *.d.ts
