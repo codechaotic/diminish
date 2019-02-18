@@ -153,6 +153,29 @@ describe('Container', function () {
     })
   })
 
+  describe('#isRegistered', function () {
+    it('should be a method', function () {
+      expect(container.isRegistered).to.be.a('function')
+    })
+
+    it('should error when key is invalid', function () {
+      expect(() => { container.isRegistered('') }).to.throw('Invalid Key')
+      expect(() => { container.isRegistered(' ') }).to.throw('Invalid Key')
+      expect(() => { container.isRegistered('#') }).to.throw('Invalid Key')
+      expect(() => { container.isRegistered('1') }).to.throw('Invalid Key')
+    })
+
+    it('should return false for unknown keys', function () {
+      registry.has.withArgs('a').returns(false)
+      expect(container.isRegistered('a')).to.be.false
+    })
+
+    it('should return true for known keys', function () {
+      registry.has.withArgs('a').returns(true)
+      expect(container.isRegistered('a')).to.be.true
+    })
+  })
+
   describe('#invoke', function () {
     it('should be a method', function () {
       expect(container.invoke).to.be.a('function')
