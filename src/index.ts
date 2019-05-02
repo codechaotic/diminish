@@ -6,7 +6,7 @@ export * from './Container'
 /**
  * Inferred resolve-type of a Promise
  */
-export type ResolveType<T> = T extends Promise<infer R> ? R : T
+export type ResolveType <T> = T extends Promise<infer R> ? R : T
 
 /**
  * Inferred return-type of a function. Unlike `ReturnType<T>`, when a function is
