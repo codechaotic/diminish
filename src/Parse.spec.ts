@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-env mocha */
+/* tslint:disable:no-unused-expression no-empty */
 
 import * as chai from 'chai'
 import * as sinon from 'sinon'
@@ -25,7 +24,7 @@ describe('Parse', function () {
     })
 
     it('should process a named class', function () {
-      const result = Diminish.getExpression(class c {})
+      const result = Diminish.getExpression(class C {})
       expect(result.type).to.eq('ClassExpression')
     })
 
@@ -106,7 +105,7 @@ describe('Parse', function () {
 
     it('should ignore the parent constructor if constructor defined', function () {
       const Parent = class { constructor () { '' } }
-      const Class = class extends Parent { constructor (a:any) { super(); a } }
+      const Class = class extends Parent { constructor (a: any) { super(); a } }
       const result = Diminish.getConstructorExpression(Class)
       expect(result).not.to.be.null
       expect(result.type).to.eq('FunctionExpression')

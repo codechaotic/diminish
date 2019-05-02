@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-env mocha */
+/* tslint:disable:no-unused-expression no-empty */
 
 import * as chai from 'chai'
 import * as sinon from 'sinon'
@@ -14,9 +13,9 @@ chai.use(chaiAsPromised)
 const expect = chai.expect
 
 describe('Resolver', function () {
-  let parse : typeof Diminish.parse & sinon.SinonStub
-  let registry : { [key in keyof Diminish.Registry<any>] : sinon.SinonStub }
-  let Registry : typeof Diminish.Registry & sinon.SinonStub
+  let parse: typeof Diminish.parse & sinon.SinonStub
+  let registry: { [key in keyof Diminish.Registry<any>]: sinon.SinonStub }
+  let Registry: typeof Diminish.Registry & sinon.SinonStub
 
   function createResolver (name, producer) {
     const resolver = new Diminish.Resolver(registry as any, name, producer)
@@ -48,7 +47,7 @@ describe('Resolver', function () {
 
     it('should call a function with given arguments', function () {
       parse.returns({ type: 'function', args: [] })
-      let args : any[]
+      let args: any[]
       const resolver = createResolver('x', (...x: any[]) => { args = x }) as any
       resolver._apply(null, [1, 2])
       expect(args).to.deep.eq([1, 2])
@@ -56,7 +55,7 @@ describe('Resolver', function () {
 
     it('should create call a constructor with given arguments', function () {
       parse.returns({ type: 'class', args: [] })
-      let args : any[]
+      let args: any[]
       const resolver = createResolver('x', class { constructor (...x: any[]) { args = x } }) as any
       resolver._apply(null, [1, 2])
       expect(args).to.deep.eq([1, 2])
@@ -65,7 +64,7 @@ describe('Resolver', function () {
     it('should call function with a custom context', function () {
       parse.returns({ type: 'function', args: [] })
       let context = { value: 10 }
-      let actual : any
+      let actual: any
       const resolver = createResolver('x', function () { actual = this }) as any
       resolver._apply(context, [])
       expect(actual).to.eq(context)
@@ -215,7 +214,7 @@ describe('Resolver', function () {
       const isCircular = sinon.stub(resolver, 'isCircular')
       isCircular.returns(false)
 
-      const exposed : any = resolver
+      const exposed: any = resolver
       exposed._ready = true
       exposed._value = true
 
@@ -227,7 +226,7 @@ describe('Resolver', function () {
       const isCircular = sinon.stub(resolver, 'isCircular')
       isCircular.returns(false)
 
-      const exposed : any = resolver
+      const exposed: any = resolver
       exposed._promise = Promise.resolve(true)
 
       const result = resolver.resolve()
@@ -241,8 +240,8 @@ describe('Resolver', function () {
       const isCircular = sinon.stub(resolver, 'isCircular')
       isCircular.returns(false)
 
-      const exposed : any = resolver
-      const _resolve : sinon.SinonStub<any[], any> = sinon.stub(exposed, '_resolve')
+      const exposed: any = resolver
+      const _resolve: sinon.SinonStub<any[], any> = sinon.stub(exposed, '_resolve')
       _resolve.returns(true)
 
       const result = resolver.resolve()
@@ -256,8 +255,8 @@ describe('Resolver', function () {
       const isCircular = sinon.stub(resolver, 'isCircular')
       isCircular.returns(false)
 
-      const exposed : any = resolver
-      const _resolve : sinon.SinonStub<any[], any> = sinon.stub(exposed, '_resolve')
+      const exposed: any = resolver
+      const _resolve: sinon.SinonStub<any[], any> = sinon.stub(exposed, '_resolve')
       _resolve.resolves(true)
 
       const result = resolver.resolve()

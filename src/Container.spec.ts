@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-env mocha */
+/* tslint:disable:no-unused-expression no-empty */
 
 import * as path from 'path'
 import * as chai from 'chai'
@@ -14,11 +13,11 @@ chai.use(chaiAsPromised)
 const expect = chai.expect
 
 describe('Container', function () {
-  let container : Diminish.Container
-  let registry : { [key in keyof Diminish.Registry<any>] : sinon.SinonStub }
-  let resolver : { [key in keyof Diminish.Resolver<any>] : sinon.SinonStub }
-  let Resolver : typeof Diminish.Resolver & sinon.SinonStub
-  let Registry : typeof Diminish.Registry & sinon.SinonStub
+  let container: Diminish.Container
+  let registry: { [key in keyof Diminish.Registry<any>]: sinon.SinonStub }
+  let resolver: { [key in keyof Diminish.Resolver<any>]: sinon.SinonStub }
+  let Resolver: typeof Diminish.Resolver & sinon.SinonStub
+  let Registry: typeof Diminish.Registry & sinon.SinonStub
 
   beforeEach(function () {
     registry = {
@@ -105,8 +104,8 @@ describe('Container', function () {
     })
 
     it('should define a trivial producer', function () {
-      let producer : Function
-      Resolver.callsFake((...args : any[]) => { producer = args[2] })
+      let producer: Function
+      Resolver.callsFake((...args: any[]) => { producer = args[2] })
       container.literal('a', true)
       expect(producer).to.be.a('function')
       expect(producer()).to.eq(true)
@@ -217,10 +216,10 @@ describe('Container', function () {
   })
 
   describe('#import', function () {
-    let fake : Object
-    let find : sinon.SinonStub
-    let load : sinon.SinonStub
-    let loader : sinon.SinonStub
+    let fake: Object
+    let find: sinon.SinonStub
+    let load: sinon.SinonStub
+    let loader: sinon.SinonStub
 
     beforeEach(function () {
       fake = { fake: true }

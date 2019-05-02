@@ -4,7 +4,7 @@ import { parseScript } from 'esprima'
 import * as Diminish from '.'
 import * as assert from 'assert'
 
-export type FunctionType = 'class'|'function'|'arrow'
+export type FunctionType = 'class' | 'function' | 'arrow'
 export type FunctionArgs = Array<string | string[]>
 export type FunctionInfo = {
   type: FunctionType,
@@ -17,14 +17,14 @@ const NATIVE_REGEXP = /\{\s*\[native code\]\s*\}/
 // Items in the result can be a string, representing an identifier name, or
 // an array of strings, representing identifier names to attach to an object.
 // i.e. if fn = (a, { b }) => {}, extractArgs(fn) -> ['a', ['b']]
-export function parse (fn: Function) : FunctionInfo {
+export function parse (fn: Function): FunctionInfo {
   assert(fn instanceof Function, 'Must be a function or class')
   assert(!NATIVE_REGEXP.test('' + fn), 'Cannot parse a native function')
 
   const expression = Diminish.getExpression(fn)
 
-  let type : FunctionType
-  let args : FunctionArgs
+  let type: FunctionType
+  let args: FunctionArgs
   switch (expression.type) {
     case 'ClassExpression':
       type = 'class'
@@ -43,17 +43,17 @@ export function parse (fn: Function) : FunctionInfo {
   return { type, args }
 }
 
-export function getExpression (fn : Function) {
+export function getExpression (fn: Function) {
   let program
 
   // Parsing fn.toString() directly fails for anonymous function definitions.
   // Wrapping it in a pointless assignment ensures it's always parsable
-  try { program = parseScript('fn=' + fn) } catch (error) {}
+  try { program = parseScript('fn=' + fn) } catch (error) { /* ignore */ }
 
   // That can still fail when the function is defined directly on an object,
   // such as { fn() {} }. In this case, the function token needs to be
   // inserted before it's parseable on its own.
-  if (!program) try { program = parseScript('fn=function ' + fn) } catch (error) {}
+  if (!program) try { program = parseScript('fn=function ' + fn) } catch (error) { /* ignore */ }
 
   // That covers all currently known cases, so anything else should be an error
   // If new cases are found, insert them here somewhere.
@@ -102,7 +102,7 @@ export function getConstructorExpression (constructor: Function) {
 }
 
 export function getArgs (expression: any) {
-  let args : FunctionArgs = []
+  let args: FunctionArgs = []
   if (expression) {
     for (const param of expression.params) {
       switch (param.type) {
@@ -110,7 +110,7 @@ export function getArgs (expression: any) {
           args.push(param.name)
           break
         case 'ObjectPattern':
-          let keys : string[] = []
+          let keys: string[] = []
           for (const property of param.properties) {
             const key = property.key
             keys.push(key.name)

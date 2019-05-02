@@ -8,15 +8,15 @@ import { Producer, Resolver, Registry } from '.'
 const KEY_REGEX = /[a-zA-Z_$][0-9a-zA-Z_$]*/
 
 export type ProducerObject < ITypes > = {
-  [Key in keyof ITypes] : Producer<ITypes[Key]>
+  [Key in keyof ITypes]: Producer<ITypes[Key]>
 }
 
 export type LiteralObject < ITypes > = {
-  [Key in keyof ITypes] : ITypes[Key]
+  [Key in keyof ITypes]: ITypes[Key]
 }
 
 export type ResolverObject < ITypes > = {
-  [Key in keyof ITypes] : Resolver<ITypes[Key]>
+  [Key in keyof ITypes]: Resolver<ITypes[Key]>
 }
 
 export type ImportLoader = (container: Container, module: any) => void
@@ -31,8 +31,8 @@ export type ImportOptions = {
 // Ignore these rows when calculating coverage. This is used to allow mocking
 // the import and glob functions in tests.
 export const Module = {
-  load: (module:string) => import(module),
-  find: (pattern:string, options: glob.IOptions) => {
+  load: (module: string) => import(module),
+  find: (pattern: string, options: glob.IOptions) => {
     return new Promise<string[]>((resolve, reject) => {
       glob(pattern, options, (err, matches) => {
         err ? reject(err) : resolve(matches)
@@ -41,7 +41,7 @@ export const Module = {
   }
 }
 
-export const DefaultImportOptions : ImportOptions = {
+export const DefaultImportOptions: ImportOptions = {
   include: [],
   exclude: [],
   cwd: process.cwd(),
@@ -53,10 +53,10 @@ export const DefaultImportOptions : ImportOptions = {
 export class Container<ITypes = any> {
   private _registry = new Registry<ITypes>()
 
-  public register (obj: Partial<ProducerObject<ITypes>>) : void
-  public register<Key extends keyof ITypes> (key: Key, producer: Producer<ITypes[Key]>) : void
-  public register (...args: any[]) : void {
-    let obj : Partial<ProducerObject<ITypes>>
+  public register (obj: Partial<ProducerObject<ITypes>>): void
+  public register<Key extends keyof ITypes> (key: Key, producer: Producer<ITypes[Key]>): void
+  public register (...args: any[]): void {
+    let obj: Partial<ProducerObject<ITypes>>
 
     switch (args.length) {
       case 1: obj = args[0]; break
@@ -87,10 +87,10 @@ export class Container<ITypes = any> {
     }
   }
 
-  public literal (obj: Partial<LiteralObject<ITypes>>) : void
-  public literal<Key extends keyof ITypes> (key: Key, value: ITypes[Key]) : void
-  public literal (...args: any[]) : void {
-    let obj : Partial<LiteralObject<ITypes>>
+  public literal (obj: Partial<LiteralObject<ITypes>>): void
+  public literal<Key extends keyof ITypes> (key: Key, value: ITypes[Key]): void
+  public literal (...args: any[]): void {
+    let obj: Partial<LiteralObject<ITypes>>
 
     switch (args.length) {
       case 1: obj = args[0]; break
@@ -107,13 +107,13 @@ export class Container<ITypes = any> {
         throw new Error(`Error while registering key '${key}': Duplicate key`)
       }
 
-      const producer : Producer<any> = () => obj[key]
+      const producer: Producer<any> = () => obj[key]
       const resolver = new Resolver<any>(this._registry, key as string, producer)
       this._registry.set(key, resolver)
     }
   }
 
-  public resolve<Key extends keyof ITypes> (key: Key) : ITypes[Key] | Promise<ITypes[Key]> {
+  public resolve<Key extends keyof ITypes> (key: Key): ITypes[Key] | Promise<ITypes[Key]> {
     const resolver = this._registry.get<Key>(key)
 
     if (!resolver) {
@@ -127,11 +127,11 @@ export class Container<ITypes = any> {
     }
   }
 
-  public invoke<Result> (fn: Producer<Result>) : Result | Promise<Result>
-  public invoke<Result> (context: any, fn: Producer<Result>) : Result | Promise<Result>
-  public invoke<Result> (...args: any[]) : Result | Promise<Result> {
-    let fn : Producer<Result>
-    let context : any = null
+  public invoke<Result> (fn: Producer<Result>): Result | Promise<Result>
+  public invoke<Result> (context: any, fn: Producer<Result>): Result | Promise<Result>
+  public invoke<Result> (...args: any[]): Result | Promise<Result> {
+    let fn: Producer<Result>
+    let context: any = null
 
     switch (args.length) {
       case 1: [fn] = args; break
@@ -147,10 +147,9 @@ export class Container<ITypes = any> {
     return resolver.resolve(context)
   }
 
-  public async import (pattern: string | string[]) : Promise<void>
-  public async import (pattern: string | string[], options: ImportOptions & { include?: never }) : Promise<void>
-  public async import (options: ImportOptions) : Promise<void>
-  public async import (...args: any[]) : Promise<void> {
+  public async import (pattern: string | string[], options?: ImportOptions & { include?: never }): Promise<void>
+  public async import (options: ImportOptions): Promise<void>
+  public async import (...args: any[]): Promise<void> {
     const options = {} as ImportOptions
     const defaults = DefaultImportOptions
 
@@ -172,8 +171,8 @@ export class Container<ITypes = any> {
       default: throw new Error(`Expected 1 or 2 arguments. Got ${args.length}`)
     }
 
-    const include : string[] = [].concat(options.include || defaults.include)
-    const ignore : string[] = [].concat(options.exclude || defaults.exclude)
+    const include: string[] = [].concat(options.include || defaults.include)
+    const ignore: string[] = [].concat(options.exclude || defaults.exclude)
     const loader = options.loader || defaults.loader
     const cwd = options.cwd || defaults.cwd
 

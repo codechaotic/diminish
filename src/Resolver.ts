@@ -12,10 +12,10 @@ export class Resolver<Result = any> {
   private _reg: Registry<any>
   private _info: FunctionInfo
   private _name: string
-  private _fn : Producer<Result>
-  private _ready : boolean
-  private _promise : Promise<Result>
-  private _value : Result
+  private _fn: Producer<Result>
+  private _ready: boolean
+  private _promise: Promise<Result>
+  private _value: Result
 
   private _apply (context: any, params: any[]) {
     switch (this._info.type) {
@@ -32,14 +32,14 @@ export class Resolver<Result = any> {
     }
   }
 
-  private _resolve (context = null) : Result | Promise<Result> {
+  private _resolve (context = null): Result | Promise<Result> {
     const params = [] as Array<any>
     const promises = [] as Array<Promise<any>>
 
     for (const arg of this._info.args) {
       if (Array.isArray(arg)) {
         const keys = arg
-        const obj = {} as { [x:string]: any }
+        const obj = {} as { [x: string]: any }
         const promises = [] as Array<Promise<any>>
 
         for (const key of keys) {
@@ -50,7 +50,7 @@ export class Resolver<Result = any> {
 
         for (const key of keys) {
           if (obj[key] instanceof Promise) {
-            promises.push(obj[key].then((value:any) => (obj[key] = value)))
+            promises.push(obj[key].then((value: any) => (obj[key] = value)))
           }
         }
 
@@ -65,7 +65,7 @@ export class Resolver<Result = any> {
 
     for (let i = 0; i < params.length; i++) {
       if (params[i] instanceof Promise) {
-        promises.push(params[i].then((result:any) => {
+        promises.push(params[i].then((result: any) => {
           return params.splice(i, 1, result)
         }))
       }
@@ -85,10 +85,10 @@ export class Resolver<Result = any> {
     this._promise = null
   }
 
-  public isCircular (path: Array<string> = []) : boolean {
+  public isCircular (path: Array<string> = []): boolean {
     if (path.includes(this._name)) return true
 
-    let deps : string[] = []
+    let deps: string[] = []
     for (const arg of this._info.args) {
       deps = deps.concat(arg)
     }
@@ -112,14 +112,16 @@ export class Resolver<Result = any> {
     return false
   }
 
-  public resolve (context = null) : Result | Promise<Result> {
+  public resolve (context = null): Result | Promise<Result> {
     if (this.isCircular()) {
       throw new Error(`has circular dependencies`)
     }
 
-    if (this._ready) return this._value
-    else if (this._promise) return this._promise
-    else {
+    if (this._ready) {
+      return this._value
+    } else if (this._promise) {
+      return this._promise
+    } else {
       const result = this._resolve(context)
       if (result instanceof Promise) {
         this._promise = result.then(

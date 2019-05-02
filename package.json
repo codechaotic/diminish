@@ -1,6 +1,6 @@
 {
   "name": "diminish",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "engines": {
     "node": ">=6.4.0"
   },
@@ -36,16 +36,10 @@
       "src/**/*.spec.ts"
     ]
   },
-  "standard": {
-    "parser": "typescript-eslint-parser",
-    "plugins": [
-      "typescript"
-    ]
-  },
   "scripts": {
     "build": "tsc",
     "clean": "rimraf src/**/*.d.ts* src/**/*.js* coverage",
-    "lint": "standard src/**/*.ts",
+    "lint": "tslint src/**/*.ts",
     "coverage": "nyc report --reporter=html && opn ./coverage/index.html",
     "report-coverage": "nyc report --reporter=text-lcov | coveralls",
     "test": "nyc mocha --opts mocha.opts src/**/*.spec.ts"
@@ -60,24 +54,23 @@
     "@types/esprima": "^4.0.2",
     "@types/glob": "^7.1.1",
     "@types/mocha": "^5.2.6",
-    "@types/node": "^10.12.26",
-    "@types/sinon": "^7.0.6",
+    "@types/node": "^10.14.6",
+    "@types/sinon": "^7.0.11",
     "@types/sinon-chai": "^3.2.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.0.2",
-    "eslint-plugin-typescript": "^0.14.0",
+    "coveralls": "^3.0.3",
     "mocha": "^5.2.0",
     "mocha-lcov-reporter": "^1.3.0",
-    "nyc": "^13.3.0",
-    "opn-cli": "^4.0.0",
+    "nyc": "^14.1.0",
+    "opn-cli": "^4.1.0",
     "rimraf": "^2.6.3",
-    "sinon": "^7.2.4",
+    "sinon": "^7.3.2",
     "sinon-chai": "^3.3.0",
-    "source-map-support": "^0.5.10",
-    "standard": "^12.0.1",
+    "source-map-support": "^0.5.12",
     "ts-node": "^7.0.1",
-    "typescript": "^3.3.3",
-    "typescript-eslint-parser": "^21.0.2"
+    "tslint": "^5.16.0",
+    "tslint-config-standard": "^8.0.1",
+    "typescript": "^3.4.5"
   }
 }
