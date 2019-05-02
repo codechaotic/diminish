@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-env mocha */
+/* tslint:disable:no-unused-expression no-empty */
 
 import * as chai from 'chai'
 import * as sinon from 'sinon'
@@ -14,8 +13,8 @@ chai.use(chaiAsPromised)
 const expect = chai.expect
 
 describe('Registry', function () {
-  let resolver : { [key in keyof Diminish.Resolver<any>] : sinon.SinonStub }
-  let registry : Diminish.Registry<any>
+  let resolver: { [key in keyof Diminish.Resolver<any>]: sinon.SinonStub }
+  let registry: Diminish.Registry<any>
 
   beforeEach(function () {
     resolver = {
@@ -32,7 +31,7 @@ describe('Registry', function () {
     })
 
     it('should return a registered resolver', function () {
-      const exposed : any = registry
+      const exposed: any = registry
       exposed._map.set('a', resolver)
       expect(registry.get('a')).to.eq(resolver)
     })
@@ -45,7 +44,7 @@ describe('Registry', function () {
 
     it('should register a resolver', function () {
       registry.set('a', resolver as any)
-      const exposed : any = registry
+      const exposed: any = registry
       expect(exposed._map.get('a')).to.eq(resolver)
     })
   })
@@ -56,7 +55,7 @@ describe('Registry', function () {
     })
 
     it('should return true for registered keys', function () {
-      const exposed : any = registry
+      const exposed: any = registry
       exposed._map.set('a', resolver)
       expect(registry.has('a')).to.be.true
     })
