@@ -69,5 +69,5 @@
 		"test": "nyc mocha --config mocharc.yml src/**/*.spec.ts"
 	},
 	"types": "types",
-	"version": "1.0.0"
+	"version": "1.0.1"
 }
