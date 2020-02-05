@@ -6,12 +6,17 @@
     "target": "es6",
     "lib": ["es7"],
     "declaration": true,
-    "declarationMap": true
+    "declarationDir": "types",
+    "declarationMap": true,
+    "outDir": "dist",
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "strictBindCallApply": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true
   },
   "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules"
+    "src"
   ]
 }

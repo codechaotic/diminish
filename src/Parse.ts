@@ -23,8 +23,8 @@ export function parse (fn: Function): FunctionInfo {
 
   const expression = Diminish.getExpression(fn)
 
-  let type: FunctionType
-  let args: FunctionArgs
+  let type: any
+  let args: any
   switch (expression.type) {
     case 'ClassExpression':
       type = 'class'
@@ -77,7 +77,8 @@ export function getExpression (fn: Function) {
   return func
 }
 
-export function getConstructorExpression (constructor: Function) {
+export function getConstructorExpression (constructor: Function)
+export function getConstructorExpression (constructor: any) {
   if (typeof constructor !== 'function') {
     throw new Error('Not a Function')
   }

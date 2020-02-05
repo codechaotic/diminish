@@ -1,76 +1,73 @@
 {
-  "name": "diminish",
-  "version": "0.6.0",
-  "engines": {
-    "node": ">=6.4.0"
-  },
-  "description": "Minimal dependency injection to diminish code complexity",
-  "main": "src",
-  "types": "src",
-  "author": "Asa Jones <thinkinfractals@gmail.com> (https://github.com/codechaotic)",
-  "license": "ISC",
-  "keywords": [
-    "container",
-    "typescript",
-    "dependency",
-    "injection",
-    "inversion",
-    "control",
-    "ioc",
-    "di"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/codechaotic/diminish"
-  },
-  "bugs": {
-    "url": "https://github.com/codechaotic/diminish/issues"
-  },
-  "nyc": {
-    "extension": [
-      ".ts",
-      ".tsx"
-    ],
-    "exclude": [
-      "src/**/*.d.ts*",
-      "src/**/*.spec.ts"
-    ]
-  },
-  "scripts": {
-    "build": "tsc",
-    "clean": "rimraf src/**/*.d.ts* src/**/*.js* coverage",
-    "lint": "tslint src/**/*.ts",
-    "coverage": "nyc report --reporter=html && opn ./coverage/index.html",
-    "report-coverage": "nyc report --reporter=text-lcov | coveralls",
-    "test": "nyc mocha --opts mocha.opts src/**/*.spec.ts"
-  },
-  "dependencies": {
-    "esprima": "^4.0.1",
-    "glob": "^7.1.3"
-  },
-  "devDependencies": {
-    "@types/chai": "^4.1.7",
-    "@types/chai-as-promised": "^7.1.0",
-    "@types/esprima": "^4.0.2",
-    "@types/glob": "^7.1.1",
-    "@types/mocha": "^5.2.6",
-    "@types/node": "^10.14.6",
-    "@types/sinon": "^7.0.11",
-    "@types/sinon-chai": "^3.2.2",
-    "chai": "^4.2.0",
-    "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.0.3",
-    "mocha": "^5.2.0",
-    "mocha-lcov-reporter": "^1.3.0",
-    "nyc": "^14.1.0",
-    "opn-cli": "^4.1.0",
-    "rimraf": "^2.6.3",
-    "sinon": "^7.3.2",
-    "sinon-chai": "^3.3.0",
-    "source-map-support": "^0.5.12",
-    "ts-node": "^7.0.1",
-    "tslint": "^5.16.0",
-    "tslint-config-standard": "^8.0.1",
-    "typescript": "^3.4.5"
-  }
+	"author": "Asa Jones <thinkinfractals@gmail.com> (https://github.com/codechaotic)",
+	"bugs": {
+		"url": "https://github.com/codechaotic/diminish/issues"
+	},
+	"dependencies": {
+		"esprima": "^4.0.1",
+		"glob": "^7.1.3"
+	},
+	"description": "Minimal dependency injection to diminish code complexity",
+	"devDependencies": {
+		"@types/chai": "^4.2.6",
+		"@types/chai-as-promised": "^7.1.2",
+		"@types/esprima": "^4.0.2",
+		"@types/glob": "^7.1.1",
+		"@types/mocha": "^5.2.6",
+		"@types/node": "^10.17.6",
+		"@types/sinon": "^7.5.1",
+		"@types/sinon-chai": "^3.2.3",
+		"chai": "^4.2.0",
+		"chai-as-promised": "^7.1.1",
+		"coveralls": "^3.0.9",
+		"mocha": "^7.0.0",
+		"mocha-lcov-reporter": "^1.3.0",
+		"nyc": "^15.0.0",
+		"open-cli": "^5.0.0",
+		"rimraf": "^3.0.0",
+		"sinon": "^7.5.0",
+		"sinon-chai": "^3.3.0",
+		"source-map-support": "^0.5.16",
+		"ts-node": "^8.5.4",
+		"tslint": "^5.20.1",
+		"tslint-config-standard": "^9.0.0",
+		"typescript": "^3.7.5"
+	},
+	"keywords": [
+		"container",
+		"typescript",
+		"dependency",
+		"injection",
+		"inversion",
+		"control",
+		"ioc",
+		"di"
+	],
+	"license": "ISC",
+	"main": "dist",
+	"name": "diminish",
+	"nyc": {
+		"extension": [
+			".ts",
+			".tsx"
+		],
+		"exclude": [
+			"src/**/*.d.ts*",
+			"src/**/*.spec.ts"
+		]
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/codechaotic/diminish"
+	},
+	"scripts": {
+		"build": "rimraf dest types && tsc --project tsconfig.json",
+		"clean": "rimraf dest types",
+		"lint": "tslint --project tsconfig.json src/**/*.ts",
+		"coverage": "nyc report --reporter=html && open-cli ./coverage/index.html",
+		"report-coverage": "nyc report --reporter=text-lcov | coveralls",
+		"test": "nyc mocha --config mocharc.yml src/**/*.spec.ts"
+	},
+	"types": "types",
+	"version": "1.0.0"
 }

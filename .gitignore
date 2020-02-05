@@ -1,10 +1,10 @@
-dist/
-type/
-node_modules/
-coverage/
 .nyc_output/
 .vscode/
-*.js
-*.js.map
 *.d.ts
 *.d.ts.map
+*.js
+*.js.map
+coverage/
+dist/
+node_modules/
+type/

@@ -14,20 +14,20 @@ export class Resolver<Result = any> {
   private _name: string
   private _fn: Producer<Result>
   private _ready: boolean
-  private _promise: Promise<Result>
-  private _value: Result
+  private _promise: Promise<Result> | null
+  private _value: Result | null
 
-  private _apply (context: any, params: any[]) {
+  private _apply (context: any, params: any[]): Result {
     switch (this._info.type) {
       case 'class':
         assert(context === null, 'constructor cannot be called with custom context')
-        const Class = Function.prototype.bind.apply(this._fn, [null].concat(params)) as Constructor<Result>
+        const Class = Function.prototype.bind.apply(this._fn, [null, ...params]) as Constructor<Result>
         return new Class()
       case 'arrow':
         assert(context === null, 'arrow function cannot be called with custom context')
         /* falls through */
       case 'function':
-        const Factory = this._fn as Factory<Result> | AsyncFactory<Result>
+        const Factory = this._fn as Factory<any> | AsyncFactory<any>
         return Factory.apply(context, params)
     }
   }
@@ -118,7 +118,7 @@ export class Resolver<Result = any> {
     }
 
     if (this._ready) {
-      return this._value
+      return this._value as Result
     } else if (this._promise) {
       return this._promise
     } else {
