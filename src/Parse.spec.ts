@@ -113,7 +113,8 @@ describe('Parse', function () {
     })
 
     it('should error on non-function', function () {
-      expect(() => Diminish.getConstructorExpression(null)).to.throw('Not a Function')
+      const getConstructorExpression = Diminish.getConstructorExpression as any
+      expect(() => getConstructorExpression(null)).to.throw('Not a Function')
     })
 
     it('should error on non-class', function () {

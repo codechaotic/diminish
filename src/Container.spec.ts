@@ -1,4 +1,4 @@
-/* tslint:disable:no-unused-expression no-empty */
+/* tslint:disable:no-unused-expression no-empty await-promise */
 
 import * as path from 'path'
 import * as chai from 'chai'
@@ -13,7 +13,7 @@ chai.use(chaiAsPromised)
 const expect = chai.expect
 
 describe('Container', function () {
-  let container: Diminish.Container
+  let container: any
   let registry: { [key in keyof Diminish.Registry<any>]: sinon.SinonStub }
   let resolver: { [key in keyof Diminish.Resolver<any>]: sinon.SinonStub }
   let Resolver: typeof Diminish.Resolver & sinon.SinonStub
@@ -104,7 +104,7 @@ describe('Container', function () {
     })
 
     it('should define a trivial producer', function () {
-      let producer: Function
+      let producer: any
       Resolver.callsFake((...args: any[]) => { producer = args[2] })
       container.literal('a', true)
       expect(producer).to.be.a('function')
@@ -217,9 +217,9 @@ describe('Container', function () {
 
   describe('#import', function () {
     let fake: Object
-    let find: sinon.SinonStub
-    let load: sinon.SinonStub
-    let loader: sinon.SinonStub
+    let find: sinon.SinonStub<any, any>
+    let load: sinon.SinonStub<any, any>
+    let loader!: sinon.SinonStub<any, any>
 
     beforeEach(function () {
       fake = { fake: true }
@@ -255,8 +255,9 @@ describe('Container', function () {
     })
 
     it('should register raw modules in the default loader', async function () {
+      const DefaultImportOptions = Diminish.DefaultImportOptions as any
       loader.restore()
-      Diminish.DefaultImportOptions.loader(container, { x: () => 10 })
+      DefaultImportOptions.loader(container, { x: () => 10 })
 
       expect(registry.set).to.have.been.calledWith('x', resolver)
     })

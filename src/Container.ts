@@ -67,6 +67,7 @@ export class Container<ITypes = any> {
     const resolvers = {} as ResolverObject<ITypes>
 
     for (const key in obj) {
+      const producer = obj[key] as any
       if (!KEY_REGEX.test(key as string)) {
         throw new Error(`Error while registering key '${key}': Invalid Key`)
       }
@@ -75,7 +76,7 @@ export class Container<ITypes = any> {
         throw new Error(`Error while registering key '${key}': Duplicate key`)
       }
 
-      resolvers[key] = new Resolver<any>(this._registry, key as string, obj[key])
+      resolvers[key] = new Resolver<any>(this._registry, key as string, producer)
 
       if (resolvers[key].isCircular()) {
         throw new Error(`Error while registering key '${key}': Producer has circular dependencies`)
@@ -130,7 +131,7 @@ export class Container<ITypes = any> {
   public invoke<Result> (fn: Producer<Result>): Result | Promise<Result>
   public invoke<Result> (context: any, fn: Producer<Result>): Result | Promise<Result>
   public invoke<Result> (...args: any[]): Result | Promise<Result> {
-    let fn: Producer<Result>
+    let fn: any
     let context: any = null
 
     switch (args.length) {
@@ -147,7 +148,7 @@ export class Container<ITypes = any> {
     return resolver.resolve(context)
   }
 
-  public async import (pattern: string | string[], options?: ImportOptions & { include?: never }): Promise<void>
+  public async import (pattern: string | string[], options?: ImportOptions): Promise<void>
   public async import (options: ImportOptions): Promise<void>
   public async import (...args: any[]): Promise<void> {
     const options = {} as ImportOptions
@@ -171,10 +172,10 @@ export class Container<ITypes = any> {
       default: throw new Error(`Expected 1 or 2 arguments. Got ${args.length}`)
     }
 
-    const include: string[] = [].concat(options.include || defaults.include)
-    const ignore: string[] = [].concat(options.exclude || defaults.exclude)
-    const loader = options.loader || defaults.loader
-    const cwd = options.cwd || defaults.cwd
+    const include = ([] as any[]).concat(options?.include ?? defaults.include)
+    const ignore = ([] as any[]).concat(options?.exclude ?? defaults.exclude)
+    const loader: any = options.loader || defaults.loader
+    const cwd: any = options.cwd || defaults.cwd
 
     if (include.length === 0) {
       throw new Error('Must provide at least one include pattern')
@@ -184,7 +185,7 @@ export class Container<ITypes = any> {
       throw new Error('Patterns must be strings')
     }
 
-    const files = []
+    const files: any[] = []
     for (const pattern of include) {
       const matches = await Module.find(pattern, { cwd, ignore, nodir: true })
       for (const match of matches) files.push(path.resolve(cwd, match))

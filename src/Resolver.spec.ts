@@ -13,9 +13,9 @@ chai.use(chaiAsPromised)
 const expect = chai.expect
 
 describe('Resolver', function () {
-  let parse: typeof Diminish.parse & sinon.SinonStub
+  let parse: sinon.SinonStub<any, any>
   let registry: { [key in keyof Diminish.Registry<any>]: sinon.SinonStub }
-  let Registry: typeof Diminish.Registry & sinon.SinonStub
+  let Registry: sinon.SinonStub<any, any>
 
   function createResolver (name, producer) {
     const resolver = new Diminish.Resolver(registry as any, name, producer)
@@ -47,7 +47,7 @@ describe('Resolver', function () {
 
     it('should call a function with given arguments', function () {
       parse.returns({ type: 'function', args: [] })
-      let args: any[]
+      let args!: any[]
       const resolver = createResolver('x', (...x: any[]) => { args = x }) as any
       resolver._apply(null, [1, 2])
       expect(args).to.deep.eq([1, 2])
@@ -55,7 +55,7 @@ describe('Resolver', function () {
 
     it('should create call a constructor with given arguments', function () {
       parse.returns({ type: 'class', args: [] })
-      let args: any[]
+      let args!: any[]
       const resolver = createResolver('x', class { constructor (...x: any[]) { args = x } }) as any
       resolver._apply(null, [1, 2])
       expect(args).to.deep.eq([1, 2])
@@ -65,7 +65,7 @@ describe('Resolver', function () {
       parse.returns({ type: 'function', args: [] })
       let context = { value: 10 }
       let actual: any
-      const resolver = createResolver('x', function () { actual = this }) as any
+      const resolver = createResolver('x', function (this: any) { actual = this }) as any
       resolver._apply(context, [])
       expect(actual).to.eq(context)
     })
